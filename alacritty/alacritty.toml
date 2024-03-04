@@ -1,0 +1,22 @@
+[font]
+size = 18.0
+
+[font.bold]
+style = "Bold"
+
+[font.bold_italic]
+style = "Bold Italic"
+
+[font.italic]
+style = "Italic"
+
+[font.normal]
+family = "BlexMono Nerd Font Mono"
+style = "Regular"
+
+[shell]
+args = ["--login"]
+program = "/opt/homebrew/bin/fish"
+
+# [window]
+# opacity = 0.8
