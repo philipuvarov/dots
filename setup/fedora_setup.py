@@ -184,10 +184,16 @@ def setup_dotfiles():
         run(["ln", "-s", str(xremap_src), str(xremap_dst)])
 
     # Symlink zshrc
-    zshrc_src = dots_dir / "zshrc"
+    zshrc_src = dots_dir / "zshrc" / ".zshrc"
     zshrc_dst = Path.home() / ".zshrc"
     if zshrc_src.exists() and not zshrc_dst.exists():
         run(["ln", "-s", str(zshrc_src), str(zshrc_dst)])
+
+    # Symlink starship config
+    starship_src = dots_dir / "starship" / "starship.toml"
+    starship_dst = config_dir / "starship.toml"
+    if starship_src.exists() and not starship_dst.exists():
+        run(["ln", "-s", str(starship_src), str(starship_dst)])
 
 
 def setup_xremap_service():
@@ -264,6 +270,21 @@ def change_shell_to_zsh():
     section("Changing default shell to zsh")
     zsh_path = "/usr/bin/zsh"
     run(["sudo", "chsh", "-s", zsh_path, os.environ["USER"]])
+
+
+def install_starship_prompt():
+    section("Installing Starship prompt")
+    # run("curl -sS https://starship.rs/install.sh | sh -- -y", shell=True)
+    run(
+        [
+            "curl",
+            "-sS",
+            "https://starship.rs/install.sh",
+            "-o",
+            "/tmp/install_starship.sh",
+        ]
+    )
+    run(["sh", "/tmp/install_starship.sh", "-y"])
 
 
 def print_post_install_notes():
