@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """
-Fedora Desktop Environment Setup Script
+Arch Linux Desktop Environment Setup Script
 
 Recreates a development environment based on captured setup history.
-Run with: python3 fedora_setup.py [--dry-run]
+Run with: python3 arch_setup.py [--dry-run]
+
+Requires: yay (AUR helper) - install manually first if not present
 """
 
 import subprocess
-import os
 import sys
 from pathlib import Path
 
 from packages import (
     COMMON_PACKAGES,
-    FEDORA_FLATPAK_PACKAGES,
+    ARCH_EXTRA_PACKAGES,
     NERD_FONTS,
     GIT_CONFIG,
     DOTFILE_REPOS,
@@ -21,19 +22,6 @@ from packages import (
 )
 
 DRY_RUN = "--dry-run" in sys.argv
-
-# =============================================================================
-# Fedora-Specific Configuration
-# =============================================================================
-
-COPR_REPOS = [
-    "dejan/lazygit",
-]
-
-RPMFUSION_FREE_URL = (
-    "https://download1.rpmfusion.org/free/fedora/"
-    "rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
-)
 
 # =============================================================================
 # Helpers
@@ -62,32 +50,30 @@ def section(title: str):
     print(f"\n{'=' * 60}\n{title}\n{'=' * 60}")
 
 
+def check_yay():
+    """Check if yay is installed, offer to install if not."""
+    result = subprocess.run(["which", "yay"], capture_output=True)
+    if result.returncode != 0:
+        print("yay (AUR helper) is not installed.")
+        print("Install it with:")
+        print("  git clone https://aur.archlinux.org/yay.git")
+        print("  cd yay && makepkg -si")
+        sys.exit(1)
+
+
 # =============================================================================
 # Setup Steps
 # =============================================================================
 
 
-def install_rpmfusion():
-    section("Installing RPM Fusion (free)")
-    # Need shell=True for the $(rpm -E %fedora) expansion
-    run(f"sudo dnf install -y {RPMFUSION_FREE_URL}", shell=True)
+def install_pacman_packages():
+    section("Installing pacman packages")
+    run(["sudo", "pacman", "-S", "--needed", "--noconfirm"] + COMMON_PACKAGES)
 
 
-def enable_copr_repos():
-    section("Enabling COPR repositories")
-    for repo in COPR_REPOS:
-        run(["sudo", "dnf", "copr", "enable", "-y", repo])
-
-
-def install_dnf_packages():
-    section("Installing DNF packages")
-    run(["sudo", "dnf", "install", "-y"] + COMMON_PACKAGES)
-
-
-def install_flatpak_packages():
-    section("Installing Flatpak packages")
-    for pkg in FEDORA_FLATPAK_PACKAGES:
-        run(["flatpak", "install", "-y", "flathub", pkg])
+def install_aur_packages():
+    section("Installing AUR packages")
+    run(["yay", "-S", "--needed", "--noconfirm"] + ARCH_EXTRA_PACKAGES)
 
 
 def install_uv():
@@ -179,12 +165,10 @@ def install_nerd_fonts():
         run(["curl", "-L", "-o", str(zip_path), url])
         run(["unzip", "-o", str(zip_path), "-d", str(extract_dir)])
 
-        # Copy only .ttf files (skip Windows-compatible .otf and license files)
+        # Copy only .ttf files
         if not DRY_RUN:
             for ttf in extract_dir.glob("*.ttf"):
                 run(["cp", str(ttf), str(fonts_dir)])
-
-    # run(["fc-cache", "-fv"])
 
 
 def disable_gnome_super_keybindings():
@@ -197,12 +181,11 @@ def disable_gnome_super_keybindings():
 def change_shell_to_zsh():
     section("Changing default shell to zsh")
     zsh_path = "/usr/bin/zsh"
-    run(["sudo", "chsh", "-s", zsh_path, os.environ["USER"]])
+    run(["chsh", "-s", zsh_path])
 
 
 def install_starship_prompt():
     section("Installing Starship prompt")
-    # run("curl -sS https://starship.rs/install.sh | sh -- -y", shell=True)
     run(
         [
             "curl",
@@ -222,7 +205,7 @@ def install_omzsh_and_plugins():
         print(f"{omz_dir} already exists, skipping oh-my-zsh installation")
     else:
         run(
-            'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended',
+            "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" \"\" --unattended",
             shell=True,
         )
 
@@ -280,10 +263,9 @@ def main():
     if DRY_RUN:
         print("*** DRY RUN MODE - No changes will be made ***\n")
 
-    install_rpmfusion()
-    enable_copr_repos()
-    install_dnf_packages()
-    install_flatpak_packages()
+    check_yay()
+    install_pacman_packages()
+    install_aur_packages()
     install_uv()
     setup_git_config()
     generate_ssh_key()

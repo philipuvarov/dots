@@ -2,10 +2,12 @@
 
 ## Overview
 
-This is a **personal dotfiles repository** for managing development environment configurations across Fedora Linux systems. The repository provides automated setup scripts and version-controlled configuration files for a complete development environment.
+This is a **personal dotfiles repository** for managing development environment configurations across Linux systems. The repository provides automated setup scripts and version-controlled configuration files for a complete development environment.
 
-**Target OS**: Fedora Linux
-**Setup Command**: `uv run fedora_setup.py` (from the `setup/` directory)
+**Supported Distros**: Fedora Linux, Arch Linux
+**Setup Commands** (from the `setup/` directory):
+- Fedora: `uv run fedora_setup.py`
+- Arch: `uv run arch_setup.py`
 
 ## Repository Structure
 
@@ -17,10 +19,12 @@ dots/
 │   └── .zshrc          # Shell config with oh-my-zsh, vim keybindings
 ├── starship/           # Starship prompt configuration
 │   └── starship.toml   # Custom prompt styling (purple/red/green theme)
-├── xremap/             # Keyboard remapping configuration
-│   └── config.yml      # Key remapping (CapsLock→Ctrl, Alt↔Super)
+├── keyd/               # Keyboard remapping configuration
+│   └── default.conf    # Key remapping (CapsLock→Ctrl, Alt↔Super)
 └── setup/              # Setup automation scripts
-    ├── fedora_setup.py # Main setup script (365 lines)
+    ├── packages.py     # Shared package definitions across distros
+    ├── fedora_setup.py # Fedora setup script
+    ├── arch_setup.py   # Arch Linux setup script
     ├── pyproject.toml  # Python project metadata
     └── .python-version # Python 3.14
 ```
@@ -45,46 +49,59 @@ dots/
 - Right-aligned time display (HH:MM)
 - Git branch/status visualization, command duration
 
-### Keyboard (xremap/config.yml)
-- Global modmap: CapsLock → Ctrl_L, Alt_L ↔ Super_L
-- Contains commented-out keymaps for various applications
-- Runs as systemd service (requires input group membership)
+### Keyboard (keyd/default.conf)
+- Global remapping: CapsLock → Ctrl, Alt ↔ Super
+- Runs as system service (keyd)
+- Config copied to /etc/keyd/default.conf by setup script
 
-## Setup Script (setup/fedora_setup.py)
+## Setup Scripts
 
-### Usage
+### Shared Configuration (packages.py)
+Common definitions used by both setup scripts:
+- **COMMON_PACKAGES**: neovim, kitty, zsh, lazygit, luarocks, fzf, telegram-desktop, steam, keyd
+- **NERD_FONTS**: IBMPlexMono, ZedMono
+- **GIT_CONFIG**: user.email, user.name
+
+### Fedora Setup (fedora_setup.py)
 ```bash
 cd setup/
 uv run fedora_setup.py          # Full setup
 uv run fedora_setup.py --dry-run # Preview without executing
 ```
 
-### Installation Steps (in order)
+**Installation Steps:**
 1. RPM Fusion repositories (free media packages)
-2. COPR repositories (xremap, lazygit)
-3. DNF packages: neovim, kitty, zsh, lazygit, steam, telegram-desktop, luarocks, fzf
-4. COPR packages: xremap
-5. Flatpak packages: Bitwarden, Discord
-6. uv (Python package manager)
-7. Git configuration (email, username)
-8. SSH key generation (Ed25519 for GitHub)
-9. Dotfiles symlinks to ~/.config/
-10. xremap systemd service setup
-11. Nerd Fonts (IBMPlexMono, ZedMono)
-12. GNOME keybinding cleanup (disables Super+N)
-13. Default shell change to zsh
-14. Starship prompt installation
-15. Oh-My-Zsh with plugins
+2. COPR repositories (lazygit)
+3. DNF packages (from COMMON_PACKAGES, includes keyd)
+4. Flatpak packages: Bitwarden, Discord
+5. uv, git config, SSH key, dotfiles, keyd setup
+6. Nerd Fonts, GNOME keybindings, zsh, Starship, Oh-My-Zsh
+
+### Arch Setup (arch_setup.py)
+```bash
+cd setup/
+uv run arch_setup.py          # Full setup
+uv run arch_setup.py --dry-run # Preview without executing
+```
+
+**Requirements**: yay (AUR helper) must be installed first
+
+**Installation Steps:**
+1. Pacman packages (from COMMON_PACKAGES, includes keyd)
+2. AUR packages: bitwarden, discord
+3. uv, git config, SSH key, dotfiles, keyd setup
+4. Nerd Fonts, GNOME keybindings, zsh, Starship, Oh-My-Zsh
 
 ### Symlink Strategy
 The script creates these symlinks:
 - `kitty/` → `~/.config/kitty/`
-- `xremap/` → `~/.config/xremap/`
 - `zsh/.zshrc` → `~/.zshrc`
 - `starship/starship.toml` → `~/.config/starship.toml`
 
+Note: keyd config is copied (not symlinked) to `/etc/keyd/default.conf`
+
 ### Post-Setup Requirements
-- **Reboot required** for xremap (input group) and shell change
+- **Reboot required** for shell change to zsh
 - **Manual steps**:
   - Upload SSH key to GitHub (`cat ~/.ssh/id_ed25519.pub`)
   - Select Nerd Font in terminal
@@ -94,13 +111,13 @@ The script creates these symlinks:
 - **Idempotent**: Checks existence before creating files/directories
 - **Safe**: Dry-run mode available, existence checks prevent overwrites
 - **Modern**: Uses subprocess with proper error handling
-- **Service-oriented**: Enables (not starts) xremap service for post-reboot
+- **Service-oriented**: keyd starts immediately, enabled for boot
 
 ## Development Environment Focus
 
 The owner's environment emphasizes:
 - **Keyboard efficiency**: Vim keybindings everywhere, custom key remapping
-- **Modern tooling**: Neovim, lazygit, starship, xremap
+- **Modern tooling**: Neovim, lazygit, starship, keyd
 - **Terminal-centric workflow**: Kitty terminal, zsh shell
 - **Git integration**: Built-in SSH key setup, git configuration
 - **Python development**: Python 3.14, uv package manager
@@ -118,15 +135,16 @@ Main branch: `main`
 ## When Helping With This Repository
 
 ### Common Tasks
-- **Adding new config**: Create directory, add config file, update fedora_setup.py symlinks
-- **Adding new distro**: Create new setup script (e.g., `ubuntu_setup.py`) in setup/
-- **Modifying setup**: Edit fedora_setup.py, test with --dry-run first
+- **Adding new config**: Create directory, add config file, update setup scripts' symlinks
+- **Adding new distro**: Create new setup script in setup/, import from packages.py
+- **Adding shared packages**: Edit packages.py COMMON_PACKAGES list
+- **Modifying setup**: Edit the relevant setup script, test with --dry-run first
 - **Config changes**: Edit files directly (kitty.conf, .zshrc, etc.)
 
 ### Important Notes
 - Always test setup script changes with `--dry-run` first
 - Symlinks mean config changes are immediate (no re-linking needed)
-- xremap requires input group membership (needs reboot)
+- keyd config changes require re-running setup or manually copying to /etc/keyd/
 - The repository references external dependency: kickstart.nvim for neovim config
 
 ### File Locations After Setup
