@@ -28,6 +28,7 @@ DRY_RUN = "--dry-run" in sys.argv
 
 COPR_REPOS = [
     "dejan/lazygit",
+    "alternateved/keyd",
 ]
 
 RPMFUSION_FREE_URL = (

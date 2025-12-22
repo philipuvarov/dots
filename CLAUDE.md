@@ -71,7 +71,7 @@ uv run fedora_setup.py --dry-run # Preview without executing
 
 **Installation Steps:**
 1. RPM Fusion repositories (free media packages)
-2. COPR repositories (lazygit)
+2. COPR repositories (lazygit, keyd)
 3. DNF packages (from COMMON_PACKAGES, includes keyd)
 4. Flatpak packages: Bitwarden, Discord
 5. uv, git config, SSH key, dotfiles, keyd setup
