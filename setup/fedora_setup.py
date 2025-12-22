@@ -48,8 +48,8 @@ RPMFUSION_FREE_URL = (
 )
 
 DOTFILE_REPOS = {
-    "nvim": "https://github.com/dotfiles-user/kickstart.nvim.git",
-    "dots": "https://github.com/dotfiles-user/dots.git",
+    "nvim": "git@github.com:dotfiles-user/kickstart.nvim.git",
+    "dots": "git@github.com:dotfiles-user/dots.git",
 }
 
 GIT_CONFIG = {
@@ -164,12 +164,7 @@ def setup_dotfiles():
     else:
         run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
 
-    # Clone dots repo and symlink configs
-    dots_dir = Path.home() / ".dots"
-    if dots_dir.exists():
-        print(f"{dots_dir} already exists, skipping clone")
-    else:
-        run(["git", "clone", DOTFILE_REPOS["dots"], str(dots_dir)])
+    dots_dir = Path.cwd()
 
     # Symlink kitty config
     kitty_src = dots_dir / "kitty"
@@ -256,7 +251,7 @@ def install_nerd_fonts():
             for ttf in extract_dir.glob("*.ttf"):
                 run(["cp", str(ttf), str(fonts_dir)])
 
-    run(["fc-cache", "-fv"])
+    # run(["fc-cache", "-fv"])
 
 
 def disable_gnome_super_keybindings():
@@ -285,6 +280,28 @@ def install_starship_prompt():
         ]
     )
     run(["sh", "/tmp/install_starship.sh", "-y"])
+
+
+def install_omzsh_and_plugins():
+    section("Installing oh my zsh")
+    run(
+        [
+            "sh",
+            "-c",
+            "https://starship.rs/install.sh",
+            "-o",
+            "/tmp/install_starship.sh",
+        ]
+    )
+    run(
+        [
+            "curl",
+            "-sS",
+            "https://starship.rs/install.sh",
+            "-o",
+            "/tmp/install_starship.sh",
+        ]
+    )
 
 
 def print_post_install_notes():
@@ -330,6 +347,7 @@ def main():
     install_nerd_fonts()
     disable_gnome_super_keybindings()
     change_shell_to_zsh()
+    install_starship_prompt()
     print_post_install_notes()
 
     print("\n✓ Setup complete! Please reboot.")

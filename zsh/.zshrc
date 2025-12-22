@@ -82,3 +82,5 @@ compinit
 source $ZSH/oh-my-zsh.sh
 ZSH_THEME_TERM_TITLE_IDLE=%m:%~
 export PATH=$PATH:$HOME/go/bin
+
+. "$HOME/.local/bin/env"
