@@ -284,22 +284,30 @@ def install_starship_prompt():
 
 def install_omzsh_and_plugins():
     section("Installing oh my zsh")
+    # sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     run(
         [
             "sh",
             "-c",
-            "https://starship.rs/install.sh",
-            "-o",
-            "/tmp/install_starship.sh",
+            "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
         ]
     )
+    # git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
     run(
         [
-            "curl",
-            "-sS",
-            "https://starship.rs/install.sh",
-            "-o",
-            "/tmp/install_starship.sh",
+            "git",
+            "clone",
+            "https://github.com/zsh-users/zsh-syntax-highlighting.git",
+            "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting",
+        ]
+    )
+    # git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    run(
+        [
+            "git",
+            "clone",
+            "https://github.com/zsh-users/zsh-autosuggestions.git",
+            "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions",
         ]
     )
 
