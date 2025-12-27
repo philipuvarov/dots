@@ -50,6 +50,31 @@ def section(title: str):
     print(f"\n{'=' * 60}\n{title}\n{'=' * 60}")
 
 
+def prompt_remove_if_exists(path: Path) -> bool:
+    """Prompt user to remove existing file/directory if it exists.
+
+    Returns True if path was removed or doesn't exist, False otherwise.
+    """
+    if not path.exists():
+        return True
+
+    if DRY_RUN:
+        print(f"[DRY RUN] Would prompt to remove existing: {path}")
+        return True
+
+    response = input(f"\n{path} already exists. Remove it? (y/n): ").strip().lower()
+    if response in ('y', 'yes'):
+        if path.is_dir() and not path.is_symlink():
+            run(["rm", "-rf", str(path)])
+        else:
+            run(["rm", "-f", str(path)])
+        print(f"Removed {path}")
+        return True
+    else:
+        print(f"Skipping {path}")
+        return False
+
+
 def check_yay():
     """Check if yay is installed, offer to install if not."""
     result = subprocess.run(["which", "yay"], capture_output=True)
@@ -118,20 +143,27 @@ def setup_dotfiles():
     # Symlink kitty config
     kitty_src = dots_dir / "kitty"
     kitty_dst = config_dir / "kitty"
-    if kitty_src.exists() and not kitty_dst.exists():
-        run(["ln", "-s", str(kitty_src), str(kitty_dst)])
-
-    # Symlink zshrc
-    zshrc_src = dots_dir / "zshrc" / ".zshrc"
-    zshrc_dst = Path.home() / ".zshrc"
-    if zshrc_src.exists() and not zshrc_dst.exists():
-        run(["ln", "-s", str(zshrc_src), str(zshrc_dst)])
+    if kitty_src.exists():
+        if prompt_remove_if_exists(kitty_dst):
+            run(["ln", "-s", str(kitty_src), str(kitty_dst)])
 
     # Symlink starship config
     starship_src = dots_dir / "starship" / "starship.toml"
     starship_dst = config_dir / "starship.toml"
-    if starship_src.exists() and not starship_dst.exists():
-        run(["ln", "-s", str(starship_src), str(starship_dst)])
+    if starship_src.exists():
+        if prompt_remove_if_exists(starship_dst):
+            run(["ln", "-s", str(starship_src), str(starship_dst)])
+
+
+def setup_zshrc():
+    """Symlink zshrc - must be called AFTER oh-my-zsh and starship are installed."""
+    section("Setting up zshrc")
+    dots_dir = Path.cwd()
+    zshrc_src = dots_dir / "zsh" / ".zshrc"
+    zshrc_dst = Path.home() / ".zshrc"
+    if zshrc_src.exists():
+        if prompt_remove_if_exists(zshrc_dst):
+            run(["ln", "-s", str(zshrc_src), str(zshrc_dst)])
 
 
 def setup_keyd():
@@ -273,9 +305,10 @@ def main():
     setup_keyd()
     install_nerd_fonts()
     disable_gnome_super_keybindings()
-    change_shell_to_zsh()
     install_starship_prompt()
     install_omzsh_and_plugins()
+    setup_zshrc()
+    change_shell_to_zsh()
     print_post_install_notes()
 
     print("\n Setup complete! Please reboot.")
