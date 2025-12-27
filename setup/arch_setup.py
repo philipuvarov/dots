@@ -63,7 +63,7 @@ def prompt_remove_if_exists(path: Path) -> bool:
         return True
 
     response = input(f"\n{path} already exists. Remove it? (y/n): ").strip().lower()
-    if response in ('y', 'yes'):
+    if response in ("y", "yes"):
         if path.is_dir() and not path.is_symlink():
             run(["rm", "-rf", str(path)])
         else:
@@ -237,7 +237,7 @@ def install_omzsh_and_plugins():
         print(f"{omz_dir} already exists, skipping oh-my-zsh installation")
     else:
         run(
-            "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" \"\" --unattended",
+            'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended',
             shell=True,
         )
 
