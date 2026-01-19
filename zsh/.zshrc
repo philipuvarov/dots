@@ -4,6 +4,9 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 eval "$(starship init zsh)"
+alias notes='cd ~/projects/notes/ && nvim .'
+alias config='cd ~/.config/ && nvim .'
+[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
