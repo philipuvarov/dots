@@ -18,9 +18,12 @@ from packages import (
     GIT_CONFIG,
     DOTFILE_REPOS,
     GNOME_KEYBINDINGS_TO_DISABLE,
+    PI_SAFE_DIRS,
+    PI_SAFE_FILES,
 )
 
 DRY_RUN = "--dry-run" in sys.argv
+DOTS_DIR = Path(__file__).resolve().parents[1]
 
 # =============================================================================
 # Fedora-Specific Configuration
@@ -68,7 +71,7 @@ def prompt_remove_if_exists(path: Path) -> bool:
 
     Returns True if path was removed or doesn't exist, False otherwise.
     """
-    if not path.exists():
+    if not path.exists() and not path.is_symlink():
         return True
 
     if DRY_RUN:
@@ -76,7 +79,7 @@ def prompt_remove_if_exists(path: Path) -> bool:
         return True
 
     response = input(f"\n{path} already exists. Remove it? (y/n): ").strip().lower()
-    if response in ('y', 'yes'):
+    if response in ("y", "yes"):
         if path.is_dir() and not path.is_symlink():
             run(["rm", "-rf", str(path)])
         else:
@@ -86,6 +89,19 @@ def prompt_remove_if_exists(path: Path) -> bool:
     else:
         print(f"Skipping {path}")
         return False
+
+
+def symlink_path(src: Path, dst: Path):
+    """Symlink src to dst if src exists."""
+    if not src.exists():
+        return
+
+    if dst.is_symlink() and dst.resolve() == src.resolve():
+        print(f"{dst} already linked, skipping")
+        return
+
+    if prompt_remove_if_exists(dst):
+        run(["ln", "-s", str(src), str(dst)])
 
 
 # =============================================================================
@@ -153,38 +169,43 @@ def setup_dotfiles():
     else:
         run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
 
-    dots_dir = Path.cwd()
-
     # Symlink kitty config
-    kitty_src = dots_dir / "kitty"
-    kitty_dst = config_dir / "kitty"
-    if kitty_src.exists():
-        if prompt_remove_if_exists(kitty_dst):
-            run(["ln", "-s", str(kitty_src), str(kitty_dst)])
+    symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
 
     # Symlink starship config
-    starship_src = dots_dir / "starship" / "starship.toml"
-    starship_dst = config_dir / "starship.toml"
-    if starship_src.exists():
-        if prompt_remove_if_exists(starship_dst):
-            run(["ln", "-s", str(starship_src), str(starship_dst)])
+    symlink_path(DOTS_DIR / "starship" / "starship.toml", config_dir / "starship.toml")
+
+
+def setup_pi():
+    section("Setting up Pi")
+    pi_src = DOTS_DIR / "pi"
+    pi_agent_dir = Path.home() / ".pi" / "agent"
+
+    if not pi_src.exists():
+        print(f"{pi_src} not found, skipping")
+        return
+
+    if DRY_RUN:
+        print(f"[DRY RUN] mkdir -p {pi_agent_dir}")
+    else:
+        pi_agent_dir.mkdir(parents=True, exist_ok=True)
+
+    for name in PI_SAFE_FILES:
+        symlink_path(pi_src / name, pi_agent_dir / name)
+
+    for name in PI_SAFE_DIRS:
+        symlink_path(pi_src / name, pi_agent_dir / name)
 
 
 def setup_zshrc():
     """Symlink zshrc - must be called AFTER oh-my-zsh and starship are installed."""
     section("Setting up zshrc")
-    dots_dir = Path.cwd()
-    zshrc_src = dots_dir / "zsh" / ".zshrc"
-    zshrc_dst = Path.home() / ".zshrc"
-    if zshrc_src.exists():
-        if prompt_remove_if_exists(zshrc_dst):
-            run(["ln", "-s", str(zshrc_src), str(zshrc_dst)])
+    symlink_path(DOTS_DIR / "zsh" / ".zshrc", Path.home() / ".zshrc")
 
 
 def setup_keyd():
     section("Setting up keyd")
-    dots_dir = Path.cwd()
-    keyd_src = dots_dir / "keyd" / "default.conf"
+    keyd_src = DOTS_DIR / "keyd" / "default.conf"
 
     # Copy keyd config to system location
     run(["sudo", "mkdir", "-p", "/etc/keyd"])
@@ -321,6 +342,7 @@ def main():
     setup_git_config()
     generate_ssh_key()
     setup_dotfiles()
+    setup_pi()
     setup_keyd()
     install_nerd_fonts()
     disable_gnome_super_keybindings()

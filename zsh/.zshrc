@@ -1,11 +1,15 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+# Machine-local shell settings and secrets, e.g. KAGI_API_TOKEN.
+[ -r "$HOME/.zshrc.local" ] && . "$HOME/.zshrc.local"
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 eval "$(starship init zsh)"
 alias notes='cd ~/projects/notes/ && nvim .'
 alias config='cd ~/.config/ && nvim .'
+alias chrome=chromium
 [ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -87,3 +91,5 @@ ZSH_THEME_TERM_TITLE_IDLE=%m:%~
 export PATH=$PATH:$HOME/go/bin
 
 . "$HOME/.local/bin/env"
+export PATH="$HOME/.npm-global/bin:$PATH"
+export EDITOR=nvim

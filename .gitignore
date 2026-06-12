@@ -1,0 +1,11 @@
+# Python cache artifacts
+__pycache__/
+*.py[cod]
+
+# Local setup environment artifacts
+setup/.venv/
+setup/uv.lock
+
+# Machine-local shell settings and secrets
+.zshrc.local
+zsh/.zshrc.local

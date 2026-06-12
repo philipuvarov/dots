@@ -65,6 +65,25 @@ DOTFILE_REPOS = {
 }
 
 # =============================================================================
+# Pi Configuration
+# =============================================================================
+
+# Do not add Pi private/runtime state here (auth.json, trust.json, sessions, bin, npm).
+PI_SAFE_FILES = [
+    "settings.json",
+    "keybindings.json",
+    "AGENTS.md",
+    "models.json",
+]
+
+PI_SAFE_DIRS = [
+    "skills",
+    "prompts",
+    "themes",
+    "extensions",
+]
+
+# =============================================================================
 # GNOME Keybindings to Disable
 # =============================================================================
 

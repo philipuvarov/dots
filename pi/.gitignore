@@ -1,0 +1,8 @@
+# Pi private/runtime state. Never commit.
+auth.json
+trust.json
+sessions/
+bin/
+npm/
+node_modules/
+*.log

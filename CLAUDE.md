@@ -21,6 +21,9 @@ dots/
 │   └── starship.toml   # Custom prompt styling (purple/red/green theme)
 ├── keyd/               # Keyboard remapping configuration
 │   └── default.conf    # Key remapping (CapsLock→Ctrl, Alt↔Super)
+├── pi/                 # Safe Pi coding agent config (no auth/sessions)
+│   ├── settings.json   # Global Pi settings
+│   └── extensions/     # Local Pi extensions
 └── setup/              # Setup automation scripts
     ├── packages.py     # Shared package definitions across distros
     ├── fedora_setup.py # Fedora setup script
@@ -53,6 +56,11 @@ dots/
 - Global remapping: CapsLock → Ctrl, Alt ↔ Super
 - Runs as system service (keyd)
 - Config copied to /etc/keyd/default.conf by setup script
+
+### Pi (pi/)
+- Safe global Pi config for `~/.pi/agent`
+- Includes `settings.json`, extension sources, and placeholder resource dirs
+- Excludes private/runtime files: `auth.json`, `trust.json`, `sessions/`, `bin/`, `npm/`, `node_modules/`
 
 ## Setup Scripts
 
@@ -97,6 +105,9 @@ The script creates these symlinks:
 - `kitty/` → `~/.config/kitty/`
 - `zsh/.zshrc` → `~/.zshrc`
 - `starship/starship.toml` → `~/.config/starship.toml`
+- `pi/settings.json` → `~/.pi/agent/settings.json`
+- `pi/{skills,prompts,themes,extensions}` → `~/.pi/agent/{skills,prompts,themes,extensions}`
+- Optional Pi files when present: `keybindings.json`, `AGENTS.md`, `models.json`
 
 Note: keyd config is copied (not symlinked) to `/etc/keyd/default.conf`
 
