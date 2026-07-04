@@ -7,6 +7,7 @@ Run with: python3 arch_setup.py [--dry-run]
 
 Requires: yay (AUR helper) - install manually first if not present
 """
+from __future__ import annotations
 
 import subprocess
 import sys

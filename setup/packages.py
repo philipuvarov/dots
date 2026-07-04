@@ -37,6 +37,27 @@ ARCH_EXTRA_PACKAGES = [
     "discord",
 ]
 
+# macOS: Homebrew packages. Linux-only keyd/GNOME behavior is intentionally
+# handled by the Linux scripts; Telegram, Discord, and Bitwarden are skipped.
+HOMEBREW_FORMULAE = [
+    "fd",
+    "go",
+    "hunspell",
+    "neovim",
+    "pkgconf",
+    "ripgrep",
+    "tree-sitter-cli",
+    "zsh",
+    "lazygit",
+    "luarocks",
+    "fzf",
+]
+
+HOMEBREW_CASKS = [
+    "kitty",
+    "steam",
+]
+
 # =============================================================================
 # Nerd Fonts
 # =============================================================================
@@ -90,4 +111,3 @@ PI_SAFE_DIRS = [
 GNOME_KEYBINDINGS_TO_DISABLE = [
     f"org.gnome.shell.keybindings switch-to-application-{i}" for i in range(1, 10)
 ]
-

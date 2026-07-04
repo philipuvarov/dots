@@ -5,6 +5,7 @@ Fedora Desktop Environment Setup Script
 Recreates a development environment based on captured setup history.
 Run with: python3 fedora_setup.py [--dry-run]
 """
+from __future__ import annotations
 
 import subprocess
 import os

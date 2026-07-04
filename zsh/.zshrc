@@ -90,6 +90,14 @@ source $ZSH/oh-my-zsh.sh
 ZSH_THEME_TERM_TITLE_IDLE=%m:%~
 export PATH=$PATH:$HOME/go/bin
 
+if [[ "$(uname)" == "Darwin" ]]; then
+  if [[ -d /opt/homebrew/include && " ${CGO_CFLAGS:-} " != *" -I/opt/homebrew/include "* ]]; then
+    export CGO_CFLAGS="-I/opt/homebrew/include${CGO_CFLAGS:+ $CGO_CFLAGS}"
+  elif [[ -d /usr/local/include && " ${CGO_CFLAGS:-} " != *" -I/usr/local/include "* ]]; then
+    export CGO_CFLAGS="-I/usr/local/include${CGO_CFLAGS:+ $CGO_CFLAGS}"
+  fi
+fi
+
 . "$HOME/.local/bin/env"
 export PATH="$HOME/.npm-global/bin:$PATH"
 export EDITOR=nvim
