@@ -13,7 +13,7 @@ Lightweight local Pi extension that adds `web_search` and `web_fetch` tools.
 
 ## Install
 
-Dotfiles setup symlinks this package into `~/.pi/agent/extensions/pi-light-web-search`, where Pi auto-discovers it.
+Dotfiles symlink `pi/extensions/` to `~/.pi/agent/extensions/`, where Pi auto-discovers this package via `index.ts`.
 
 Load directly for a single run:
 

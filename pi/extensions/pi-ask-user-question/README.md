@@ -14,9 +14,9 @@ Adds `ask_user_question` to pi. Model can ask structured clarifying questions in
 
 ## Install
 
-Dotfiles setup symlinks this package into `~/.pi/agent/extensions/pi-ask-user-question`, where Pi auto-discovers it.
+Dotfiles symlink `pi/extensions/` to `~/.pi/agent/extensions/`, where Pi auto-discovers this package via `index.ts`.
 
-Reload pi with `/reload` or restart session.
+Reload Pi with `/reload` or restart session.
 
 ## Tool schema
 
