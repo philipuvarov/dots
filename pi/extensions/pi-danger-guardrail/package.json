@@ -1,0 +1,25 @@
+{
+  "name": "pi-danger-guardrail",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Simple Pi extension that asks before dangerous bash commands run.",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "guardrail",
+    "bash",
+    "safety"
+  ],
+  "scripts": {
+    "check": "pi --offline --no-extensions --extension ./index.ts --list-models"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  }
+}
