@@ -165,8 +165,28 @@ def setup_dotfiles():
     else:
         run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
 
-    # Symlink kitty config
+    # Symlink terminal configs
     symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
+
+    ghostty_config_dir = (
+        Path.home() / "Library" / "Application Support" / "com.mitchellh.ghostty"
+    )
+    herdr_config_dir = config_dir / "herdr"
+    if DRY_RUN:
+        print(f"[DRY RUN] mkdir -p {ghostty_config_dir}")
+        print(f"[DRY RUN] mkdir -p {herdr_config_dir}")
+    else:
+        ghostty_config_dir.mkdir(parents=True, exist_ok=True)
+        herdr_config_dir.mkdir(parents=True, exist_ok=True)
+
+    symlink_path(
+        DOTS_DIR / "ghostty" / "config.ghostty",
+        ghostty_config_dir / "config.ghostty",
+    )
+    symlink_path(
+        DOTS_DIR / "herdr" / "config.toml",
+        herdr_config_dir / "config.toml",
+    )
 
     # Symlink starship config
     symlink_path(DOTS_DIR / "starship" / "starship.toml", config_dir / "starship.toml")
@@ -291,13 +311,12 @@ def print_post_install_notes():
 
 3. Run 'nvim' to trigger lazy.nvim plugin installation.
 
-4. Kitty config is linked at ~/.config/kitty and uses:
-   - BlexMono Nerd Font Mono
-   - kitty/aura-theme.conf
+4. Ghostty uses BlexMono Nerd Font and the Oxocarbon theme; its config is
+   linked under ~/Library/Application Support/com.mitchellh.ghostty.
 
-5. Set your terminal font to one of the installed Nerd Fonts:
-   - BlexMono Nerd Font
-   - ZedMono Nerd Font
+5. Kitty remains available with its Aura theme at ~/.config/kitty.
+
+6. Launch `herdr` to create or attach to its persistent terminal session.
 """)
 
 

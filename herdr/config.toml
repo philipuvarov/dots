@@ -1,0 +1,21 @@
+[keys]
+prefix = "ctrl+q"
+previous_tab = ["prefix+p", "ctrl+]"]
+next_tab = ["prefix+n", "ctrl+minus"]
+previous_workspace = "ctrl+backslash"
+next_workspace = "ctrl+^"
+
+[experimental]
+pane_history = false
+
+[ui]
+sidebar_collapsed_mode = "hidden"
+agent_panel_sort = "spaces"
+show_agent_labels_on_pane_borders = false
+
+[theme]
+name = "terminal"
+auto_switch = false
+
+[ui.toast]
+delivery = "herdr"

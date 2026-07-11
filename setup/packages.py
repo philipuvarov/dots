@@ -1,8 +1,8 @@
 """
 Shared package definitions and configuration for setup scripts.
 
-This module contains common configuration used by both fedora_setup.py
-and arch_setup.py to avoid duplication.
+This module contains shared configuration used by the Fedora, Arch, and macOS
+setup scripts to avoid duplication.
 """
 
 # =============================================================================
@@ -12,6 +12,7 @@ and arch_setup.py to avoid duplication.
 COMMON_PACKAGES = [
     "neovim",
     "kitty",
+    "ghostty",
     "zsh",
     "lazygit",
     "luarocks",
@@ -35,6 +36,7 @@ FEDORA_FLATPAK_PACKAGES = [
 ARCH_EXTRA_PACKAGES = [
     "bitwarden",
     "discord",
+    "herdr-bin",
 ]
 
 # macOS: Homebrew packages. Linux-only keyd/GNOME behavior is intentionally
@@ -42,6 +44,7 @@ ARCH_EXTRA_PACKAGES = [
 HOMEBREW_FORMULAE = [
     "fd",
     "go",
+    "herdr",
     "hunspell",
     "neovim",
     "pkgconf",
@@ -54,6 +57,7 @@ HOMEBREW_FORMULAE = [
 ]
 
 HOMEBREW_CASKS = [
+    "ghostty",
     "kitty",
     "steam",
 ]
@@ -102,6 +106,7 @@ PI_SAFE_DIRS = [
     "prompts",
     "themes",
     "extensions",
+    "local-packages",
 ]
 
 # =============================================================================

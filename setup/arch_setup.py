@@ -94,6 +94,10 @@ def symlink_path(src: Path, dst: Path):
 
 def check_yay():
     """Check if yay is installed, offer to install if not."""
+    if DRY_RUN:
+        print("[DRY RUN] which yay")
+        return
+
     result = subprocess.run(["which", "yay"], capture_output=True)
     if result.returncode != 0:
         print("yay (AUR helper) is not installed.")
@@ -123,6 +127,40 @@ def install_uv():
     run("curl -LsSf https://astral.sh/uv/install.sh | sh", shell=True)
 
 
+def setup_git_config():
+    section("Configuring Git")
+    for key, value in GIT_CONFIG.items():
+        run(["git", "config", "--global", key, value])
+
+
+def generate_ssh_key():
+    section("Generating SSH key")
+    ssh_dir = Path.home() / ".ssh"
+    ssh_key_path = ssh_dir / "id_ed25519"
+
+    if ssh_key_path.exists():
+        print(f"SSH key already exists at {ssh_key_path}, skipping")
+        return
+
+    if not DRY_RUN:
+        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+
+    email = GIT_CONFIG.get("user.email", "")
+    run(
+        [
+            "ssh-keygen",
+            "-t",
+            "ed25519",
+            "-C",
+            email,
+            "-N",
+            "",
+            "-f",
+            str(ssh_key_path),
+        ]
+    )
+
+
 def setup_dotfiles():
     section("Setting up dotfiles")
     config_dir = Path.home() / ".config"
@@ -135,8 +173,26 @@ def setup_dotfiles():
     else:
         run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
 
-    # Symlink kitty config
+    # Symlink terminal configs
     symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
+
+    ghostty_config_dir = config_dir / "ghostty"
+    herdr_config_dir = config_dir / "herdr"
+    if DRY_RUN:
+        print(f"[DRY RUN] mkdir -p {ghostty_config_dir}")
+        print(f"[DRY RUN] mkdir -p {herdr_config_dir}")
+    else:
+        ghostty_config_dir.mkdir(parents=True, exist_ok=True)
+        herdr_config_dir.mkdir(parents=True, exist_ok=True)
+
+    symlink_path(
+        DOTS_DIR / "ghostty" / "config.ghostty",
+        ghostty_config_dir / "config.ghostty",
+    )
+    symlink_path(
+        DOTS_DIR / "herdr" / "config.toml",
+        herdr_config_dir / "config.toml",
+    )
 
     # Symlink starship config
     symlink_path(DOTS_DIR / "starship" / "starship.toml", config_dir / "starship.toml")
@@ -282,9 +338,9 @@ def print_post_install_notes():
 4. Check keyd is running:
    sudo systemctl status keyd
 
-5. Set your terminal font to one of the installed Nerd Fonts:
-   - BlexMono Nerd Font
-   - ZedMono Nerd Font
+5. Ghostty is configured with BlexMono Nerd Font and the Oxocarbon theme.
+
+6. Launch `herdr` to create or attach to its persistent terminal session.
 """)
 
 

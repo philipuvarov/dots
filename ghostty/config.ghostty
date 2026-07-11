@@ -1,0 +1,28 @@
+# Font
+font-family = BlexMono Nerd Font Mono
+font-size = 16
+
+# Theme
+theme = Oxocarbon
+background-opacity = 1
+
+# Match Kitty behavior
+window-padding-x = 0
+window-padding-y = 0
+copy-on-select = false
+clipboard-trim-trailing-spaces = false
+unfocused-split-opacity = 1
+
+# Copy selection with Ctrl+C; otherwise send Ctrl+C to the terminal
+keybind = performable:ctrl+c=copy_to_clipboard
+keybind = ctrl+v=paste_from_clipboard
+
+# Cycle Herdr tabs and workspaces using single-byte direct bindings.
+keybind = super+arrow_left=text:\x1d
+keybind = super+arrow_right=text:\x1f
+keybind = super+arrow_up=text:\x1c
+keybind = super+arrow_down=text:\x1e
+
+# Minimal macOS chrome while retaining tabs
+macos-titlebar-style = tabs
+macos-window-buttons = hidden

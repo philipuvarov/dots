@@ -4,7 +4,8 @@ Safe global Pi config for `~/.pi/agent`.
 
 Included:
 - `settings.json`
-- `extensions/`
+- `extensions/` (including the Herdr agent-state integration)
+- `local-packages/pi-theme-pack/` with Aura, Cyberdream, Oxocarbon, and Tokyo Night
 - optional `keybindings.json`, `AGENTS.md`, `models.json`
 - optional `skills/`, `prompts/`, `themes/`
 
