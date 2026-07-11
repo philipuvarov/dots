@@ -1,0 +1,23 @@
+{
+  "name": "system-notify",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pi extension that sends desktop notifications when the agent finishes or waits for input.",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "notifications"
+  ],
+  "scripts": {
+    "check": "pi --offline --no-extensions --extension ./index.ts --list-models"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  }
+}

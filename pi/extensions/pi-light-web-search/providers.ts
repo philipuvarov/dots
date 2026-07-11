@@ -1,4 +1,4 @@
-export type SearchProvider = "kagi" | "duckduckgo";
+export type SearchProvider = "exa" | "kagi";
 export type FetchProvider = "kagi" | "direct";
 
 export interface SearchResult {
@@ -12,7 +12,6 @@ export interface SearchResult {
 export interface ProviderSearchResponse {
 	provider: SearchProvider;
 	results: SearchResult[];
-	warning?: string;
 }
 
 export interface ProviderFetchResponse {
@@ -28,12 +27,9 @@ export interface ProviderFetchResponse {
 	warning?: string;
 }
 
-export const DUCKDUCKGO_WARNING =
-	"DuckDuckGo fallback uses the Instant Answer API, not full web search. Results may be sparse or topic-focused.";
-
+const EXA_SEARCH_URL = "https://api.exa.ai/search";
 const KAGI_SEARCH_URL = "https://kagi.com/api/v1/search";
 const KAGI_EXTRACT_URL = "https://kagi.com/api/v1/extract";
-const DUCKDUCKGO_SEARCH_URL = "https://api.duckduckgo.com/";
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
 	return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : undefined;
@@ -54,6 +50,7 @@ function stripHtml(value: string): string {
 		.replace(/&gt;/g, ">")
 		.replace(/&nbsp;/g, " ")
 		.replace(/\s+/g, " ")
+		.replace(/\s+([,.;:!?])/g, "$1")
 		.trim();
 }
 
@@ -82,21 +79,38 @@ function truncateToMax(value: string, maxChars: number): { value: string; trunca
 	};
 }
 
+function errorMessages(value: unknown): string[] {
+	if (Array.isArray(value)) return value.flatMap(errorMessages);
+
+	const direct = asString(value);
+	if (direct) return [direct];
+
+	const record = asRecord(value);
+	if (!record) return [];
+	const message = asString(record.message) ?? asString(record.msg) ?? asString(record.detail);
+	if (message) return [message];
+	return record.error === value ? [] : errorMessages(record.error);
+}
+
 function formatProviderError(providerName: string, status: number, json: unknown, text: string, secret?: string): string {
 	const record = asRecord(json);
-	const errors = Array.isArray(record?.errors) ? record.errors : Array.isArray(record?.error) ? record.error : undefined;
-	const errorMessages = errors
-		?.flatMap((item) => {
-			const itemRecord = asRecord(item);
-			const message = asString(itemRecord?.message) ?? asString(itemRecord?.msg) ?? asString(item);
-			return message ? [message] : [];
-		})
-		.join("; ");
+	const messages = [...errorMessages(record?.errors), ...errorMessages(record?.error)];
 	const traceRecord = asRecord(record?.meta);
 	const trace = asString(traceRecord?.trace) ?? asString(traceRecord?.id);
-	const detail = errorMessages ?? (text.trim() ? truncate(redact(stripHtml(text), secret)) : "");
-	const traceDetail = trace ? ` (trace: ${trace})` : "";
-	return `${providerName} returned HTTP ${status}${detail ? `: ${detail}` : ""}${traceDetail}`;
+	const requestId = asString(record?.requestId) ?? asString(record?.request_id);
+	const tag = asString(record?.tag);
+	const rawDetail = messages.length > 0 ? truncate(messages.join("; ")) : text.trim() ? truncate(stripHtml(text)) : "";
+	const detail = rawDetail ? redact(stripHtml(rawDetail), secret) : "";
+	const tagDetail = tag ? ` [tag: ${redact(tag, secret)}]` : "";
+	const requestDetail = requestId ? ` (requestId: ${redact(requestId, secret)})` : trace ? ` (trace: ${redact(trace, secret)})` : "";
+	return redact(
+		`${providerName} returned HTTP ${status}${detail ? `: ${detail}` : ""}${tagDetail}${requestDetail}`,
+		secret,
+	);
+}
+
+function isAbortError(error: unknown, signal?: AbortSignal | null): boolean {
+	return signal?.aborted === true || (error instanceof Error && error.name === "AbortError");
 }
 
 async function fetchJson(url: string, init: RequestInit, providerName: string, secret?: string): Promise<unknown> {
@@ -104,6 +118,7 @@ async function fetchJson(url: string, init: RequestInit, providerName: string, s
 	try {
 		response = await fetch(url, init);
 	} catch (error) {
+		if (isAbortError(error, init.signal)) throw error;
 		const message = error instanceof Error ? error.message : String(error);
 		throw new Error(`${providerName} request failed: ${redact(message, secret)}`);
 	}
@@ -125,6 +140,92 @@ async function fetchJson(url: string, init: RequestInit, providerName: string, s
 	}
 
 	return json;
+}
+
+function redactSearchResult(result: SearchResult, secret: string): SearchResult {
+	return {
+		title: redact(result.title, secret),
+		url: redact(result.url, secret),
+		snippet: redact(result.snippet, secret),
+		...(result.publishedDate ? { publishedDate: redact(result.publishedDate, secret) } : {}),
+		...(result.source ? { source: redact(result.source, secret) } : {}),
+	};
+}
+
+function normalizeExaResult(item: unknown): SearchResult | undefined {
+	const record = asRecord(item);
+	if (!record) return undefined;
+
+	const url = asString(record.url);
+	const title = asString(record.title);
+	if (!url || !title) return undefined;
+
+	try {
+		const parsed = new URL(url);
+		if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return undefined;
+	} catch {
+		return undefined;
+	}
+
+	const highlights = Array.isArray(record.highlights)
+		? record.highlights.flatMap((highlight) => {
+				const text = asString(highlight);
+				return text ? [stripHtml(text)] : [];
+			})
+		: [];
+	const fallbackSnippet = asString(record.summary) ?? asString(record.text) ?? asString(record.snippet) ?? "";
+	const snippet = truncate(highlights.length > 0 ? highlights.join(" … ") : stripHtml(fallbackSnippet));
+	const publishedDate =
+		asString(record.publishedDate) ?? asString(record.published_date) ?? asString(record.published) ?? asString(record.date);
+	const source = sourceFromUrl(url);
+
+	return {
+		title: stripHtml(title),
+		url,
+		snippet,
+		...(publishedDate ? { publishedDate } : {}),
+		...(source ? { source } : {}),
+	};
+}
+
+export async function searchExa(
+	query: string,
+	numResults: number,
+	apiKey: string,
+	signal?: AbortSignal,
+): Promise<ProviderSearchResponse> {
+	const json = await fetchJson(
+		EXA_SEARCH_URL,
+		{
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				"x-api-key": apiKey,
+			},
+			body: JSON.stringify({
+				query,
+				numResults,
+				type: "auto",
+				contents: { highlights: true },
+			}),
+			signal,
+		},
+		"Exa",
+		apiKey,
+	);
+
+	const record = asRecord(json);
+	const items = Array.isArray(record?.results) ? record.results : [];
+	const results = items.flatMap((item) => {
+		const result = normalizeExaResult(item);
+		return result ? [redactSearchResult(result, apiKey)] : [];
+	});
+
+	return {
+		provider: "exa",
+		results: results.slice(0, numResults),
+	};
 }
 
 function normalizeKagiResult(item: unknown): SearchResult | undefined {
@@ -190,7 +291,7 @@ export async function searchKagi(
 				: [];
 	const results = items.flatMap((item) => {
 		const result = normalizeKagiResult(item);
-		return result ? [result] : [];
+		return result ? [redactSearchResult(result, token)] : [];
 	});
 
 	return {
@@ -238,6 +339,7 @@ export async function fetchKagiExtract(
 			signal,
 		});
 	} catch (error) {
+		if (isAbortError(error, signal)) throw error;
 		const message = error instanceof Error ? error.message : String(error);
 		throw new Error(`Kagi Extract request failed: ${redact(message, token)}`);
 	}
@@ -405,6 +507,7 @@ export async function fetchDirect(url: string, maxChars: number, signal?: AbortS
 			signal,
 		});
 	} catch (error) {
+		if (isAbortError(error, signal)) throw error;
 		const message = error instanceof Error ? error.message : String(error);
 		throw new Error(`Direct fetch request failed: ${message}`);
 	}
@@ -436,92 +539,5 @@ export async function fetchDirect(url: string, maxChars: number, signal?: AbortS
 		contentLength: truncated.originalLength,
 		truncated: truncated.truncated,
 		text: truncated.value,
-	};
-}
-
-function titleFromDuckDuckGoText(text: string): string {
-	const separator = " - ";
-	const index = text.indexOf(separator);
-	return index > 0 ? text.slice(0, index).trim() : text.trim();
-}
-
-function collectRelatedTopics(topics: unknown[], results: SearchResult[]): void {
-	for (const topic of topics) {
-		const record = asRecord(topic);
-		if (!record) continue;
-
-		if (Array.isArray(record.Topics)) {
-			collectRelatedTopics(record.Topics, results);
-			continue;
-		}
-
-		const url = asString(record.FirstURL);
-		const text = asString(record.Text);
-		if (!url || !text) continue;
-
-		const title = asString(record.Name) ?? titleFromDuckDuckGoText(text);
-		results.push({
-			title: stripHtml(title),
-			url,
-			snippet: stripHtml(text),
-			...(sourceFromUrl(url) ? { source: sourceFromUrl(url) } : {}),
-		});
-	}
-}
-
-export async function searchDuckDuckGo(
-	query: string,
-	numResults: number,
-	signal?: AbortSignal,
-): Promise<ProviderSearchResponse> {
-	const url = new URL(DUCKDUCKGO_SEARCH_URL);
-	url.searchParams.set("q", query);
-	url.searchParams.set("format", "json");
-	url.searchParams.set("no_redirect", "1");
-	url.searchParams.set("no_html", "1");
-	url.searchParams.set("skip_disambig", "1");
-
-	const json = await fetchJson(
-		url.toString(),
-		{
-			method: "GET",
-			headers: {
-				Accept: "application/json",
-			},
-			signal,
-		},
-		"DuckDuckGo",
-	);
-
-	const record = asRecord(json);
-	const results: SearchResult[] = [];
-	const abstractUrl = asString(record?.AbstractURL);
-	const abstractText = asString(record?.AbstractText) ?? asString(record?.Abstract);
-
-	if (abstractUrl && abstractText) {
-		const title = asString(record?.Heading) ?? titleFromDuckDuckGoText(abstractText);
-		results.push({
-			title: stripHtml(title),
-			url: abstractUrl,
-			snippet: stripHtml(abstractText),
-			...(sourceFromUrl(abstractUrl) ? { source: sourceFromUrl(abstractUrl) } : {}),
-		});
-	}
-
-	if (Array.isArray(record?.RelatedTopics)) {
-		collectRelatedTopics(record.RelatedTopics, results);
-	}
-
-	const seenUrls = new Set<string>();
-	const deduped = results.filter((result) => {
-		if (seenUrls.has(result.url)) return false;
-		seenUrls.add(result.url);
-		return true;
-	});
-
-	return {
-		provider: "duckduckgo",
-		results: deduped.slice(0, numResults),
-		warning: DUCKDUCKGO_WARNING,
 	};
 }

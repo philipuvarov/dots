@@ -101,3 +101,4 @@ fi
 . "$HOME/.local/bin/env"
 export PATH="$HOME/.npm-global/bin:$PATH"
 export EDITOR=nvim
+eval "$(direnv hook zsh)"

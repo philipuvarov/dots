@@ -10,8 +10,8 @@ Pi extension that asks before dangerous bash commands or sensitive filesystem ac
 - Broad permission changes: recursive `chmod 777`, recursive `chown`
 - `find -delete` and dangerous `find -exec ...` commands
 - Git destructive actions: `reset --hard`, `clean -f`, `push --force`, `checkout -f`, `restore --worktree`, `branch -D`, `stash clear/drop`, `worktree remove --force`
-- Risky containers: privileged/host namespace/root/device/socket mounts, `--cap-add`, unsafe `--security-opt`, volume deletes, prune, force remove
-- Remote scripts/code: `curl ... | sh`, `wget -O- | python`, `sh -c "$(curl ...)"`, `npx`/`bunx`/`uvx`, package install lifecycle scripts
+- Risky containers: privileged/host namespace/root/device/socket mounts, `--cap-add` with unsafe capabilities (e.g. `SYS_ADMIN`, `ALL`), unsafe `--security-opt`, volume deletes, prune, force remove
+- Remote scripts/code: `curl ... | sh`, `wget -O- | python`, `sh -c "$(curl ...)"`, `npx`/`bunx`/`uvx`, package install lifecycle scripts (npm/pnpm/yarn/bun, plus `pip install`, `pipx`, `uv add|sync|pip install`, `cargo install`, `gem install`)
 - Shell parsing risk: command substitutions, control-block keywords, `source`, shell script execution
 - Inline interpreters: `python -c`, `node -e`, `perl -e`, `ruby -e`, `php -r`, etc.
 - Sensitive bash path references inside cwd; reads outside cwd are allowed
@@ -46,4 +46,12 @@ Run `/reload` or restart Pi after install.
 
 ```bash
 npm run check
+```
+
+## Tests
+
+The detection logic lives in `analysis.ts` (dependency-free) and is covered by `analysis.test.ts`:
+
+```bash
+node --test analysis.test.ts
 ```

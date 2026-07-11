@@ -781,11 +781,28 @@ async function askWithTui(questions: NormalizedQuestion[], ctx: ExtensionContext
 			return question.options[answer.optionIndex].label;
 		}
 
+		function addWrappedWithPrefix(
+			width: number,
+			add: (line: string) => void,
+			prefix: string,
+			text: string,
+			format: (line: string) => string,
+		) {
+			const prefixWidth = visibleWidth(prefix);
+			const wrapped = wrapPlain(text, Math.max(1, width - prefixWidth));
+			const continuationPrefix = " ".repeat(prefixWidth);
+			for (let index = 0; index < wrapped.length; index++) {
+				add(`${index === 0 ? prefix : continuationPrefix}${format(wrapped[index] ?? "")}`);
+			}
+		}
+
 		function renderQuestionBody(width: number, add: (line: string) => void) {
 			const question = questions[currentTab];
-			add(theme.fg("text", ` ${question.question}`));
+			addWrappedWithPrefix(width, add, " ", question.question, (line) => theme.fg("text", line));
 			if (question.multiSelect) {
-				add(theme.fg("dim", " Multi-select: Space/Enter toggles options, then choose Next."));
+				addWrappedWithPrefix(width, add, " ", "Multi-select: Space/Enter toggles options, then choose Next.", (line) =>
+					theme.fg("dim", line),
+				);
 			}
 			add("");
 
@@ -816,7 +833,9 @@ async function askWithTui(questions: NormalizedQuestion[], ctx: ExtensionContext
 			for (let qi = 0; qi < questions.length; qi++) {
 				const answered = isAnswered(qi);
 				const q = questions[qi];
-				add(theme.fg(answered ? "text" : "warning", ` ${qi + 1}. ${q.question}`));
+				addWrappedWithPrefix(width, add, ` ${qi + 1}. `, q.question, (line) =>
+					theme.fg(answered ? "text" : "warning", line),
+				);
 				for (const line of wrapPlain(answerSummary(qi), Math.max(1, width - 5))) {
 					add(`     ${theme.fg(answered ? "success" : "warning", line)}`);
 				}
@@ -836,7 +855,7 @@ async function askWithTui(questions: NormalizedQuestion[], ctx: ExtensionContext
 
 		function renderEditorMode(width: number, add: (line: string) => void) {
 			const question = questions[editingQuestionIndex];
-			add(theme.fg("text", ` ${question.question}`));
+			addWrappedWithPrefix(width, add, " ", question.question, (line) => theme.fg("text", line));
 			add("");
 			add(theme.fg("accent", ` ${editingTitle}:`));
 			for (const line of editor.render(Math.max(1, width - 2))) {

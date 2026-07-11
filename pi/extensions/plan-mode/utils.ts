@@ -95,11 +95,63 @@ const SAFE_PATTERNS = [
 	/^\s*eza\b/i,
 ];
 
+const SEGMENT_SEPARATORS = new Set([";", "&", "|", "\n", "(", ")", "`"]);
+
+function splitCommandSegments(command: string): string[] {
+	const segments: string[] = [];
+	let current = "";
+	let quote: "'" | '"' | undefined;
+	let escaped = false;
+
+	const flush = () => {
+		const trimmed = current.trim();
+		if (trimmed.length > 0) segments.push(trimmed);
+		current = "";
+	};
+
+	for (const ch of command) {
+		if (escaped) {
+			current += ch;
+			escaped = false;
+			continue;
+		}
+		if (ch === "\\") {
+			current += ch;
+			escaped = true;
+			continue;
+		}
+		if (quote) {
+			if (ch === quote) quote = undefined;
+			current += ch;
+			continue;
+		}
+		if (ch === "'" || ch === '"') {
+			quote = ch;
+			current += ch;
+			continue;
+		}
+		if (SEGMENT_SEPARATORS.has(ch)) {
+			flush();
+			continue;
+		}
+		current += ch;
+	}
+	flush();
+	return segments;
+}
+
 export function isReadOnlyCommand(command: string): boolean {
 	const trimmed = command.trim();
 	if (!trimmed) return false;
 	if (DESTRUCTIVE_PATTERNS.some((pattern) => pattern.test(trimmed))) return false;
-	return SAFE_PATTERNS.some((pattern) => pattern.test(trimmed));
+
+	// Every segment (split on ;, &&, ||, |, &, newlines, subshells, and command
+	// substitutions) must independently match a safe pattern. This prevents
+	// bypasses like `cat x; python evil.py` or `ls $(python evil.py)` where only
+	// the leading command is read-only.
+	const segments = splitCommandSegments(trimmed);
+	if (segments.length === 0) return false;
+	return segments.every((segment) => SAFE_PATTERNS.some((pattern) => pattern.test(segment)));
 }
 
 function cleanStepText(text: string): string {

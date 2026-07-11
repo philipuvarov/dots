@@ -1,10 +1,13 @@
 {
-  "lastChangelogVersion": "0.80.3",
+  "lastChangelogVersion": "0.80.6",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
-  "defaultThinkingLevel": "xhigh",
+  "defaultModel": "gpt-5.6-sol",
+  "defaultThinkingLevel": "max",
   "hideThinkingBlock": true,
   "theme": "oxocarbon",
+  "extensions": [
+    "-extensions/pi-danger-guardrail/index.ts"
+  ],
   "packages": [
     "local-packages/pi-theme-pack"
   ]

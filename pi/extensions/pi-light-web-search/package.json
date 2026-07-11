@@ -1,6 +1,6 @@
 {
   "name": "pi-light-web-search",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Lightweight Pi extension that adds web_search and web_fetch tools.",
@@ -11,7 +11,8 @@
     "fetch"
   ],
   "scripts": {
-    "check": "pi --offline --no-extensions --extension ./index.ts --list-models"
+    "test": "node --test --test-concurrency=1 ./*.test.ts",
+    "check": "npm test && pi --offline --no-extensions --extension ./index.ts --list-models"
   },
   "pi": {
     "extensions": [

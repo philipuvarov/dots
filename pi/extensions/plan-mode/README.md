@@ -31,3 +31,10 @@ Plan:
 
 Plan mode activates only existing read-only tools: `read`, `grep`, `find`, `ls`, `bash`, common question/web tools if present.
 `bash` is allowlisted and blocks destructive commands, writes, installs, git writes, sudo, editors, and shell-pipe execution.
+Compound commands are checked per segment: every part of `a; b`, `a && b`, `a | b`, subshells, and command substitutions must independently match the read-only allowlist, so `cat x; python evil.py` is blocked.
+
+## Tests
+
+```bash
+node --test utils.test.ts
+```

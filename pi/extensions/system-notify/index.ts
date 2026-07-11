@@ -18,11 +18,33 @@ function canNotify(ctx: ExtensionContext): boolean {
 	return ctx.mode === "tui";
 }
 
+function notifyOSC777(title: string, body: string): void {
+	// Ghostty, iTerm2, WezTerm, and several other terminals support OSC 777.
+	process.stdout.write(`\x1b]777;notify;${title};${body}\x07`);
+}
+
+function notifyKitty(title: string, body: string): void {
+	// Kitty's OSC 99 protocol keeps the notification owned by the terminal app.
+	process.stdout.write(`\x1b]99;i=pi-system-notify:d=0;${title}\x1b\\`);
+	process.stdout.write(`\x1b]99;i=pi-system-notify:p=body;${body}\x1b\\`);
+}
+
+function notifyDarwin(title: string, body: string): void {
+	// Notifications emitted by osascript belong to Script Editor, so clicking one
+	// opens Script Editor instead of the terminal. Use the terminal's native
+	// notification protocol so macOS attributes it to the correct application.
+	if (process.env.KITTY_WINDOW_ID || process.env.TERM === "xterm-kitty") {
+		notifyKitty(title, body);
+	} else {
+		notifyOSC777(title, body);
+	}
+}
+
 function notify(title: string, body: string): void {
 	if (suppressWhenFocused() && terminalFocused === true) return;
 
 	if (process.platform === "darwin") {
-		execFile("osascript", ["-e", `display notification ${JSON.stringify(body)} with title ${JSON.stringify(title)}`], () => {});
+		notifyDarwin(title, body);
 	} else if (process.platform === "linux") {
 		execFile("notify-send", [title, body], () => {});
 	}
