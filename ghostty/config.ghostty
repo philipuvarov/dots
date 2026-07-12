@@ -12,14 +12,27 @@ window-padding-y = 0
 copy-on-select = false
 clipboard-trim-trailing-spaces = false
 unfocused-split-opacity = 1
+window-decoration = none
 
 # Copy selection with Ctrl+C; otherwise send Ctrl+C to the terminal
 keybind = performable:ctrl+c=copy_to_clipboard
 keybind = ctrl+v=paste_from_clipboard
+keybind = super+t=new_tab
 
-# Cycle Herdr tabs and workspaces using single-byte direct bindings.
-keybind = super+arrow_left=text:\x1d
-keybind = super+arrow_right=text:\x1f
+# Navigate Ghostty tabs.
+keybind = super+arrow_left=previous_tab
+keybind = super+arrow_right=next_tab
+keybind = super+1=goto_tab:1
+keybind = super+2=goto_tab:2
+keybind = super+3=goto_tab:3
+keybind = super+4=goto_tab:4
+keybind = super+5=goto_tab:5
+keybind = super+6=goto_tab:6
+keybind = super+7=goto_tab:7
+keybind = super+8=goto_tab:8
+keybind = super+9=goto_tab:9
+
+# Cycle Herdr workspaces using single-byte direct bindings.
 keybind = super+arrow_up=text:\x1c
 keybind = super+arrow_down=text:\x1e
 
