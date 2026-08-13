@@ -12,16 +12,16 @@ window-padding-y = 0
 copy-on-select = false
 clipboard-trim-trailing-spaces = false
 unfocused-split-opacity = 1
-window-decoration = none
+window-decoration = auto
 
 # Copy selection with Ctrl+C; otherwise send Ctrl+C to the terminal
 keybind = performable:ctrl+c=copy_to_clipboard
 keybind = ctrl+v=paste_from_clipboard
 keybind = super+t=new_tab
 
-# Navigate Ghostty tabs.
-keybind = super+arrow_left=previous_tab
-keybind = super+arrow_right=next_tab
+# Send Cmd+arrows to Herdr as modified-arrow sequences.
+keybind = super+arrow_left=text:\x1b[1;9D
+keybind = super+arrow_right=text:\x1b[1;9C
 keybind = super+1=goto_tab:1
 keybind = super+2=goto_tab:2
 keybind = super+3=goto_tab:3
@@ -38,4 +38,4 @@ keybind = super+arrow_down=text:\x1e
 
 # Minimal macOS chrome while retaining tabs
 macos-titlebar-style = tabs
-macos-window-buttons = hidden
+macos-window-buttons = visible

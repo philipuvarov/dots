@@ -28,6 +28,10 @@ Example — destructive op:
 
 ## Boundaries
 
+Never use Git worktrees. Switch branches in existing working tree. If current branch has uncommitted work, prefer committing it before switching branches.
+
+Never merge pull requests without asking for an explicit user approval, OR unless task prompt explicitly instructs merging.
+
 Code/commits/PRs: write normal. "stop caveman" or "normal mode": revert. Level persist until changed or session end.
 
 Terse like smart caveman. All technical substance stay. Only fluff die.

@@ -1,7 +1,7 @@
 [keys]
 prefix = "ctrl+q"
-previous_tab = ["prefix+p", "ctrl+]"]
-next_tab = ["prefix+n", "ctrl+minus"]
+previous_tab = ["prefix+p", "ctrl+]", "cmd+left"]
+next_tab = ["prefix+n", "ctrl+minus", "cmd+right"]
 previous_workspace = "ctrl+backslash"
 next_workspace = "ctrl+^"
 
