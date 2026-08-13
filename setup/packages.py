@@ -59,8 +59,6 @@ FEDORA_FLATPAK_PACKAGES = [
 
 # Arch: Additional packages from official repos or AUR
 ARCH_EXTRA_PACKAGES = [
-    "bitwarden",
-    "discord",
     "herdr-bin",
     "tofi",
 ]

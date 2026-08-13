@@ -128,7 +128,7 @@ uv run arch_setup.py --dry-run # Preview without executing
 
 **Installation Steps:**
 1. Pacman packages (Kitty, Hyprland stack, GDM, keyd, and shared tools; no Ghostty)
-2. yay packages: bitwarden, discord, herdr-bin, tofi
+2. AUR packages: herdr-bin, tofi
 3. uv, git config, SSH key, Hyprland/Kitty/Tofi/Herdr/Pi dotfiles, wallpaper, keyd setup
 4. Enable GDM greeter
 5. Nerd Fonts, GTK dark preference, GNOME keybindings, zsh, Starship, Oh-My-Zsh
