@@ -20,6 +20,9 @@ dots/
 │   └── config.ghostty  # Oxocarbon theme and Herdr navigation bindings
 ├── herdr/              # Herdr agent multiplexer configuration
 │   └── config.toml     # Keys, UI, notifications, and terminal theme
+├── hypr/               # Hyprland desktop, input, monitor, and wallpaper config
+├── tofi/               # Tofi application launcher config
+├── wallpapers/         # Tracked desktop wallpaper assets
 ├── zsh/                # Zsh shell configuration
 │   └── .zshrc          # Shell config with oh-my-zsh, vim keybindings
 ├── starship/           # Starship prompt configuration
@@ -51,7 +54,7 @@ dots/
 ### Terminals
 
 #### Kitty (kitty/kitty.conf)
-- Comprehensive configuration with the Aura theme
+- Comprehensive configuration with the Cyberdream theme
 - Font settings, color schemes, keyboard shortcuts
 - Window/tab management, copy/paste behavior
 
@@ -64,6 +67,12 @@ dots/
 - Agent-aware terminal multiplexer using terminal-native colors
 - Custom tab/workspace keys, hidden collapsed sidebar, and in-app notifications
 - Runtime logs, sockets, and session state stay outside the repository
+
+### Hyprland (hypr/)
+- Split config for monitors, input, keybindings, appearance, autostart, and workspace rules
+- Uses Kitty, Tofi, Nautilus, Hyprpaper, Firefox, and media/brightness controls
+- Tofi config and Aura wallpaper are tracked and linked into expected home paths
+- Arch packages include Hyprlock, Hypridle, Waybar, NetworkManager applet, portals, and Wayland clipboard tools
 
 ### Prompt (starship/starship.toml)
 - Custom format: `[username@hostname] directory git-info`
@@ -87,7 +96,8 @@ dots/
 
 ### Shared Configuration (packages.py)
 Common definitions used by the setup scripts:
-- **COMMON_PACKAGES**: neovim, kitty, ghostty, zsh, lazygit, luarocks, fzf, telegram-desktop, steam, keyd
+- **COMMON_PACKAGES**: neovim, kitty, zsh, lazygit, luarocks, fzf, telegram-desktop, steam, keyd
+- **FEDORA_PACKAGES** adds Ghostty; **ARCH_PACMAN_PACKAGES** adds Hyprland stack, GDM, portals, and desktop tools
 - **HOMEBREW_FORMULAE** includes Herdr; **HOMEBREW_CASKS** includes Ghostty and Kitty
 - **NERD_FONTS**: IBMPlexMono, ZedMono
 - **GIT_CONFIG**: user.email, user.name
@@ -102,7 +112,7 @@ uv run fedora_setup.py --dry-run # Preview without executing
 **Installation Steps:**
 1. RPM Fusion repositories (free media packages)
 2. COPR repositories (lazygit, keyd, Ghostty)
-3. DNF packages (from COMMON_PACKAGES, includes Ghostty and keyd)
+3. DNF packages (from FEDORA_PACKAGES, includes Ghostty and keyd)
 4. Flatpak packages: Bitwarden, Discord
 5. uv, Herdr, git config, SSH key, dotfiles, keyd setup
 6. Nerd Fonts, GNOME keybindings, zsh, Starship, Oh-My-Zsh
@@ -117,10 +127,11 @@ uv run arch_setup.py --dry-run # Preview without executing
 **Requirements**: yay (AUR helper) must be installed first
 
 **Installation Steps:**
-1. Pacman packages (from COMMON_PACKAGES, includes Ghostty and keyd)
-2. AUR packages: bitwarden, discord, herdr-bin
-3. uv, git config, SSH key, dotfiles, keyd setup
-4. Nerd Fonts, GNOME keybindings, zsh, Starship, Oh-My-Zsh
+1. Pacman packages (Kitty, Hyprland stack, GDM, keyd, and shared tools; no Ghostty)
+2. yay packages: bitwarden, discord, herdr-bin, tofi
+3. uv, git config, SSH key, Hyprland/Kitty/Tofi/Herdr/Pi dotfiles, wallpaper, keyd setup
+4. Enable GDM greeter
+5. Nerd Fonts, GTK dark preference, GNOME keybindings, zsh, Starship, Oh-My-Zsh
 
 ### macOS Setup (mac_setup.py)
 - Installs Homebrew formulae/casks, including Herdr, Ghostty, and Kitty
@@ -129,8 +140,11 @@ uv run arch_setup.py --dry-run # Preview without executing
 
 ### Symlink Strategy
 The script creates these symlinks:
+- `hypr/` → `~/.config/hypr/` on Arch
+- `tofi/` → `~/.config/tofi/` on Arch
+- `wallpapers/aura/1.png` → `~/wallpapers/aura/1.png` on Arch
 - `kitty/` → `~/.config/kitty/`
-- `ghostty/config.ghostty` → `~/.config/ghostty/config.ghostty` on Linux or Ghostty's Application Support directory on macOS
+- `ghostty/config.ghostty` → `~/.config/ghostty/config.ghostty` on Fedora or Ghostty's Application Support directory on macOS
 - `herdr/config.toml` → `~/.config/herdr/config.toml` (only the static config; runtime state remains local)
 - `zsh/.zshrc` → `~/.zshrc`
 - `starship/starship.toml` → `~/.config/starship.toml`
@@ -177,7 +191,7 @@ Main branch: `main`
 ### Common Tasks
 - **Adding new config**: Create directory, add config file, update setup scripts' symlinks
 - **Adding new distro**: Create new setup script in setup/, import from packages.py
-- **Adding shared packages**: Edit packages.py COMMON_PACKAGES list
+- **Adding shared packages**: Edit packages.py COMMON_PACKAGES list; use distro-specific lists for platform-only packages
 - **Modifying setup**: Edit the relevant setup script, test with --dry-run first
 - **Config changes**: Edit files directly (kitty.conf, .zshrc, etc.)
 

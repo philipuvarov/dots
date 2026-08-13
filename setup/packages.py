@@ -12,7 +12,6 @@ setup scripts to avoid duplication.
 COMMON_PACKAGES = [
     "neovim",
     "kitty",
-    "ghostty",
     "zsh",
     "lazygit",
     "luarocks",
@@ -26,6 +25,32 @@ COMMON_PACKAGES = [
 # Distro-Specific Packages
 # =============================================================================
 
+FEDORA_PACKAGES = [
+    *COMMON_PACKAGES,
+    "ghostty",
+]
+
+ARCH_PACMAN_PACKAGES = [
+    *COMMON_PACKAGES,
+    "hyprland",
+    "hyprpaper",
+    "hyprlock",
+    "hypridle",
+    "waybar",
+    "gdm",
+    "firefox",
+    "btop",
+    "nautilus",
+    "network-manager-applet",
+    "pipewire",
+    "wireplumber",
+    "brightnessctl",
+    "playerctl",
+    "xdg-desktop-portal-hyprland",
+    "xdg-desktop-portal-gtk",
+    "wl-clipboard",
+]
+
 # Fedora: Flatpak packages
 FEDORA_FLATPAK_PACKAGES = [
     "com.bitwarden.desktop",
@@ -37,6 +62,7 @@ ARCH_EXTRA_PACKAGES = [
     "bitwarden",
     "discord",
     "herdr-bin",
+    "tofi",
 ]
 
 # macOS: Homebrew packages. Linux-only keyd/GNOME behavior is intentionally

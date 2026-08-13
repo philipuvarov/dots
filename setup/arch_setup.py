@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 from packages import (
-    COMMON_PACKAGES,
+    ARCH_PACMAN_PACKAGES,
     ARCH_EXTRA_PACKAGES,
     NERD_FONTS,
     GIT_CONFIG,
@@ -114,7 +114,10 @@ def check_yay():
 
 def install_pacman_packages():
     section("Installing pacman packages")
-    run(["sudo", "pacman", "-S", "--needed", "--noconfirm"] + COMMON_PACKAGES)
+    run(
+        ["sudo", "pacman", "-S", "--needed", "--noconfirm"]
+        + ARCH_PACMAN_PACKAGES
+    )
 
 
 def install_aur_packages():
@@ -173,22 +176,27 @@ def setup_dotfiles():
     else:
         run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
 
-    # Symlink terminal configs
+    # Symlink desktop and terminal configs
+    symlink_path(DOTS_DIR / "hypr", config_dir / "hypr")
     symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
+    symlink_path(DOTS_DIR / "tofi", config_dir / "tofi")
 
-    ghostty_config_dir = config_dir / "ghostty"
+    wallpaper_dir = Path.home() / "wallpapers" / "aura"
+    if DRY_RUN:
+        print(f"[DRY RUN] mkdir -p {wallpaper_dir}")
+    else:
+        wallpaper_dir.mkdir(parents=True, exist_ok=True)
+    symlink_path(
+        DOTS_DIR / "wallpapers" / "aura" / "1.png",
+        wallpaper_dir / "1.png",
+    )
+
     herdr_config_dir = config_dir / "herdr"
     if DRY_RUN:
-        print(f"[DRY RUN] mkdir -p {ghostty_config_dir}")
         print(f"[DRY RUN] mkdir -p {herdr_config_dir}")
     else:
-        ghostty_config_dir.mkdir(parents=True, exist_ok=True)
         herdr_config_dir.mkdir(parents=True, exist_ok=True)
 
-    symlink_path(
-        DOTS_DIR / "ghostty" / "config.ghostty",
-        ghostty_config_dir / "config.ghostty",
-    )
     symlink_path(
         DOTS_DIR / "herdr" / "config.toml",
         herdr_config_dir / "config.toml",
@@ -238,6 +246,11 @@ def setup_keyd():
     run(["sudo", "systemctl", "start", "keyd"])
 
 
+def setup_gdm():
+    section("Enabling GDM greeter")
+    run(["sudo", "systemctl", "enable", "gdm.service"])
+
+
 def install_nerd_fonts():
     section("Installing Nerd Fonts")
     fonts_dir = Path.home() / ".local" / "share" / "fonts"
@@ -261,8 +274,18 @@ def install_nerd_fonts():
                 run(["cp", str(ttf), str(fonts_dir)])
 
 
-def disable_gnome_super_keybindings():
-    section("Disabling GNOME Super+N keybindings")
+def setup_desktop_preferences():
+    section("Configuring desktop preferences")
+    run(
+        [
+            "gsettings",
+            "set",
+            "org.gnome.desktop.interface",
+            "color-scheme",
+            "prefer-dark",
+        ]
+    )
+
     for binding in GNOME_KEYBINDINGS_TO_DISABLE:
         schema, key = binding.rsplit(" ", 1)
         run(["gsettings", "set", schema, key, "[]"])
@@ -338,9 +361,11 @@ def print_post_install_notes():
 4. Check keyd is running:
    sudo systemctl status keyd
 
-5. Ghostty is configured with BlexMono Nerd Font and the Oxocarbon theme.
+5. Kitty uses Cyberdream; Hyprland uses the tracked Aura wallpaper and Tofi config.
 
-6. Launch `herdr` to create or attach to its persistent terminal session.
+6. GDM starts after reboot. Select GNOME or Hyprland from its session menu.
+
+7. Launch `herdr` to create or attach to its persistent terminal session.
 """)
 
 
@@ -362,8 +387,9 @@ def main():
     setup_dotfiles()
     setup_pi()
     setup_keyd()
+    setup_gdm()
     install_nerd_fonts()
-    disable_gnome_super_keybindings()
+    setup_desktop_preferences()
     install_starship_prompt()
     install_omzsh_and_plugins()
     setup_zshrc()

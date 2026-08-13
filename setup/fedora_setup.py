@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from packages import (
-    COMMON_PACKAGES,
+    FEDORA_PACKAGES,
     FEDORA_FLATPAK_PACKAGES,
     NERD_FONTS,
     GIT_CONFIG,
@@ -125,7 +125,7 @@ def enable_copr_repos():
 
 def install_dnf_packages():
     section("Installing DNF packages")
-    run(["sudo", "dnf", "install", "-y"] + COMMON_PACKAGES)
+    run(["sudo", "dnf", "install", "-y"] + FEDORA_PACKAGES)
 
 
 def install_flatpak_packages():
