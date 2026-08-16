@@ -5,7 +5,9 @@
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": true,
   "theme": "oxocarbon",
+  "sessionDir": "~/.pi/agent/sessions-global",
   "extensions": [
+    "-extensions/ctrl-c-interrupt/index.ts",
     "-extensions/pi-danger-guardrail/index.ts"
   ],
   "packages": [
