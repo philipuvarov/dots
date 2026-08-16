@@ -1,6 +1,7 @@
 # Python cache artifacts
 __pycache__/
 *.py[cod]
+*.bak
 
 # Local setup environment artifacts
 setup/.venv/

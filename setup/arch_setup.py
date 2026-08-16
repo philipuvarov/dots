@@ -246,9 +246,15 @@ def setup_keyd():
     run(["sudo", "systemctl", "start", "keyd"])
 
 
-def setup_gdm():
-    section("Enabling GDM greeter")
-    run(["sudo", "systemctl", "enable", "gdm.service"])
+def setup_ly():
+    section("Setting up Ly greeter")
+    ly_src = DOTS_DIR / "ly" / "config.ini"
+
+    run(["sudo", "mkdir", "-p", "/etc/ly"])
+    run(["sudo", "cp", str(ly_src), "/etc/ly/config.ini"])
+    run(["sudo", "systemctl", "disable", "gdm.service"], check=False)
+    run(["sudo", "systemctl", "disable", "ly.service"], check=False)
+    run(["sudo", "systemctl", "enable", "ly@tty1.service"])
 
 
 def install_nerd_fonts():
@@ -363,7 +369,7 @@ def print_post_install_notes():
 
 5. Kitty uses Cyberdream; Hyprland uses the tracked Aura wallpaper and Tofi config.
 
-6. GDM starts after reboot. Select GNOME or Hyprland from its session menu.
+6. Ly starts after reboot. Select GNOME or Hyprland from its session menu.
 
 7. Launch `herdr` to create or attach to its persistent terminal session.
 """)
@@ -387,7 +393,7 @@ def main():
     setup_dotfiles()
     setup_pi()
     setup_keyd()
-    setup_gdm()
+    setup_ly()
     install_nerd_fonts()
     setup_desktop_preferences()
     install_starship_prompt()

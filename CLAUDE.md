@@ -72,7 +72,7 @@ dots/
 - Split config for monitors, input, keybindings, appearance, autostart, and workspace rules
 - Uses Kitty, Tofi, Nautilus, Hyprpaper, Firefox, and media/brightness controls
 - Tofi config and Aura wallpaper are tracked and linked into expected home paths
-- Arch packages include Hyprlock, Hypridle, Waybar, NetworkManager applet, portals, and Wayland clipboard tools
+- Arch packages include Hyprlock, Hypridle, Waybar, Ly, GNOME Shell, NetworkManager applet, portals, and Wayland clipboard tools
 
 ### Prompt (starship/starship.toml)
 - Custom format: `[username@hostname] directory git-info`
@@ -97,7 +97,7 @@ dots/
 ### Shared Configuration (packages.py)
 Common definitions used by the setup scripts:
 - **COMMON_PACKAGES**: neovim, kitty, zsh, lazygit, luarocks, fzf, telegram-desktop, steam, keyd
-- **FEDORA_PACKAGES** adds Ghostty; **ARCH_PACMAN_PACKAGES** adds Hyprland stack, GDM, portals, and desktop tools
+- **FEDORA_PACKAGES** adds Ghostty; **ARCH_PACMAN_PACKAGES** adds Hyprland stack, Ly, GNOME Shell, portals, and desktop tools
 - **HOMEBREW_FORMULAE** includes Herdr; **HOMEBREW_CASKS** includes Ghostty and Kitty
 - **NERD_FONTS**: IBMPlexMono, ZedMono
 - **GIT_CONFIG**: user.email, user.name
@@ -127,10 +127,10 @@ uv run arch_setup.py --dry-run # Preview without executing
 **Requirements**: yay (AUR helper) must be installed first
 
 **Installation Steps:**
-1. Pacman packages (Kitty, Hyprland stack, GDM, keyd, and shared tools; no Ghostty)
+1. Pacman packages (Kitty, Hyprland stack, Ly, GNOME Shell, keyd, and shared tools; no Ghostty)
 2. AUR packages: herdr-bin, tofi
 3. uv, git config, SSH key, Hyprland/Kitty/Tofi/Herdr/Pi dotfiles, wallpaper, keyd setup
-4. Enable GDM greeter
+4. Install Cyberdream Ly config and enable Ly greeter
 5. Nerd Fonts, GTK dark preference, GNOME keybindings, zsh, Starship, Oh-My-Zsh
 
 ### macOS Setup (mac_setup.py)
@@ -146,6 +146,7 @@ The script creates these symlinks:
 - `kitty/` → `~/.config/kitty/`
 - `ghostty/config.ghostty` → `~/.config/ghostty/config.ghostty` on Fedora or Ghostty's Application Support directory on macOS
 - `herdr/config.toml` → `~/.config/herdr/config.toml` (only the static config; runtime state remains local)
+- `ly/config.ini` → `/etc/ly/config.ini` on Arch (copied, not symlinked)
 - `zsh/.zshrc` → `~/.zshrc`
 - `starship/starship.toml` → `~/.config/starship.toml`
 - `pi/settings.json` → `~/.pi/agent/settings.json`
@@ -198,7 +199,7 @@ Main branch: `main`
 ### Important Notes
 - Always test setup script changes with `--dry-run` first
 - Symlinks mean config changes are immediate (no re-linking needed)
-- keyd config changes require re-running setup or manually copying to /etc/keyd/
+- keyd and Ly config changes require re-running setup or manually copying to `/etc/keyd/` and `/etc/ly/`
 - The repository references external dependency: kickstart.nvim for neovim config
 
 ### File Locations After Setup

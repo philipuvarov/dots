@@ -5,6 +5,8 @@ This module contains shared configuration used by the Fedora, Arch, and macOS
 setup scripts to avoid duplication.
 """
 
+import os
+
 # =============================================================================
 # Common Packages (available in both distros under same/similar names)
 # =============================================================================
@@ -37,7 +39,8 @@ ARCH_PACMAN_PACKAGES = [
     "hyprlock",
     "hypridle",
     "waybar",
-    "gdm",
+    "ly",
+    "gnome-shell",
     "firefox",
     "btop",
     "nautilus",
@@ -99,9 +102,16 @@ NERD_FONTS = [
 # Git Configuration
 # =============================================================================
 
+_GIT_EMAIL = os.environ.get("DOTS_GIT_EMAIL")
+_GIT_NAME = os.environ.get("DOTS_GIT_NAME")
+
 GIT_CONFIG = {
-    "user.email": "user@example.invalid",
-    "user.name": "dotfiles-user",
+    key: value
+    for key, value in {
+        "user.email": _GIT_EMAIL,
+        "user.name": _GIT_NAME,
+    }.items()
+    if value
 }
 
 # =============================================================================
@@ -109,8 +119,8 @@ GIT_CONFIG = {
 # =============================================================================
 
 DOTFILE_REPOS = {
-    "nvim": "git@github.com:dotfiles-user/kickstart.nvim.git",
-    "dots": "git@github.com:dotfiles-user/dots.git",
+    "nvim": os.environ.get("DOTS_NVIM_REPO", "https://github.com/nvim-lua/kickstart.nvim.git"),
+    "dots": os.environ.get("DOTS_REPO", ""),
 }
 
 # =============================================================================

@@ -31,11 +31,11 @@ const ALLOWED_COMMANDS = [
 	"python --version",
 	"npm list --depth=0",
 	// Common repo paths and Git global options must not be mistaken for commands.
-	"ls -la /Users/user/code/lovable",
-	"find /Users/user/code/lovable -type f 2>/dev/null",
-	"git -C /Users/user/projects/code1 status --short --branch",
-	"git -C /Users/user/projects/code1 remote -v",
-	"git -C /Users/user/projects/code1 worktree list --porcelain",
+	"ls -la /workspace/code/lovable",
+	"find /workspace/code/lovable -type f 2>/dev/null",
+	"git -C /workspace/projects/code1 status --short --branch",
+	"git -C /workspace/projects/code1 remote -v",
+	"git -C /workspace/projects/code1 worktree list --porcelain",
 	// compound commands where every segment is read-only
 	"cat foo.txt; ls",
 	"git log | head -3",
