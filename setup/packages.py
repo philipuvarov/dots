@@ -39,6 +39,8 @@ ARCH_PACMAN_PACKAGES = [
     "hyprlock",
     "hypridle",
     "waybar",
+    "mako",
+    "libnotify",
     "ly",
     "gnome-shell",
     "firefox",

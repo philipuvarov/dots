@@ -179,6 +179,7 @@ def setup_dotfiles():
     # Symlink desktop and terminal configs
     symlink_path(DOTS_DIR / "hypr", config_dir / "hypr")
     symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
+    symlink_path(DOTS_DIR / "mako", config_dir / "mako")
     symlink_path(DOTS_DIR / "tofi", config_dir / "tofi")
 
     wallpaper_dir = Path.home() / "wallpapers" / "aura"
@@ -367,7 +368,7 @@ def print_post_install_notes():
 4. Check keyd is running:
    sudo systemctl status keyd
 
-5. Kitty uses Cyberdream; Hyprland uses the tracked Aura wallpaper and Tofi config.
+5. Kitty uses Cyberdream; Hyprland uses the tracked Aura wallpaper, Tofi, and Mako configs.
 
 6. Ly starts after reboot. Select GNOME or Hyprland from its session menu.
 

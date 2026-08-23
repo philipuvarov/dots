@@ -1,0 +1,23 @@
+# Mako notification daemon config for Hyprland.
+
+# Dismiss normal notifications automatically after 5 seconds.
+default-timeout=5000
+
+# Keep the notification stack small and unobtrusive.
+max-visible=5
+
+# Place notifications in the top-right corner.
+anchor=top-right
+margin=16
+
+# Simple dark styling.
+background-color=#16181AEE
+text-color=#FFFFFFFF
+border-color=#5EF1FFFF
+border-size=2
+border-radius=8
+padding=12
+
+[urgency=critical]
+default-timeout=10000
+border-color=#FF6E5EFF
