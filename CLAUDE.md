@@ -114,7 +114,7 @@ uv run fedora_setup.py --dry-run # Preview without executing
 2. COPR repositories (lazygit, keyd, Ghostty)
 3. DNF packages (from FEDORA_PACKAGES, includes Ghostty and keyd)
 4. Flatpak packages: Bitwarden, Discord
-5. uv, Herdr, git config, SSH key, dotfiles, keyd setup
+5. uv, Pi, Herdr, git config, SSH key, dotfiles, keyd setup
 6. Nerd Fonts, GNOME keybindings, zsh, Starship, Oh-My-Zsh
 
 ### Arch Setup (arch_setup.py)
@@ -129,12 +129,13 @@ uv run arch_setup.py --dry-run # Preview without executing
 **Installation Steps:**
 1. Pacman packages (Kitty, Hyprland stack, Ly, GNOME Shell, keyd, and shared tools; no Ghostty)
 2. AUR packages: herdr-bin, tofi
-3. uv, git config, SSH key, Hyprland/Kitty/Tofi/Herdr/Pi dotfiles, wallpaper, keyd setup
+3. uv, Pi, git config, SSH key, Hyprland/Kitty/Tofi/Herdr/Pi dotfiles, wallpaper, keyd setup
 4. Install Cyberdream Ly config and enable Ly greeter
 5. Nerd Fonts, GTK dark preference, GNOME keybindings, zsh, Starship, Oh-My-Zsh
 
 ### macOS Setup (mac_setup.py)
 - Installs Homebrew formulae/casks, including Herdr, Ghostty, and Kitty
+- Installs Pi with its official installer
 - Links macOS's Ghostty Application Support config plus shared Herdr/Pi/shell configs
 - Installs Nerd Fonts, Starship, Oh-My-Zsh, and plugins
 

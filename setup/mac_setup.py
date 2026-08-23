@@ -130,6 +130,11 @@ def install_uv():
     run("curl -LsSf https://astral.sh/uv/install.sh | sh", shell=True)
 
 
+def install_pi():
+    section("Installing Pi")
+    run("curl -fsSL https://pi.dev/install.sh | sh", shell=True)
+
+
 def setup_git_config():
     section("Configuring git")
     for key, value in GIT_CONFIG.items():
@@ -331,6 +336,7 @@ def main():
 
     install_homebrew_packages()
     install_uv()
+    install_pi()
     setup_git_config()
     generate_ssh_key()
     setup_dotfiles()

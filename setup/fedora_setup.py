@@ -139,6 +139,11 @@ def install_uv():
     run("curl -LsSf https://astral.sh/uv/install.sh | sh", shell=True)
 
 
+def install_pi():
+    section("Installing Pi")
+    run("curl -fsSL https://pi.dev/install.sh | sh", shell=True)
+
+
 def install_herdr():
     section("Installing Herdr")
     run("curl -fsSL https://herdr.dev/install.sh | sh", shell=True)
@@ -364,6 +369,7 @@ def main():
     install_dnf_packages()
     install_flatpak_packages()
     install_uv()
+    install_pi()
     install_herdr()
     setup_git_config()
     generate_ssh_key()

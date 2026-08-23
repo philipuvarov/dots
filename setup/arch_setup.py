@@ -130,6 +130,11 @@ def install_uv():
     run("curl -LsSf https://astral.sh/uv/install.sh | sh", shell=True)
 
 
+def install_pi():
+    section("Installing Pi")
+    run("curl -fsSL https://pi.dev/install.sh | sh", shell=True)
+
+
 def setup_git_config():
     section("Configuring Git")
     for key, value in GIT_CONFIG.items():
@@ -389,6 +394,7 @@ def main():
     install_pacman_packages()
     install_aur_packages()
     install_uv()
+    install_pi()
     setup_git_config()
     generate_ssh_key()
     setup_dotfiles()

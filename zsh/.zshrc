@@ -4,8 +4,10 @@
 # Machine-local shell settings and secrets, e.g. KAGI_API_TOKEN.
 [ -r "$HOME/.zshrc.local" ] && . "$HOME/.zshrc.local"
 
-# Use the desktop keyring-backed SSH agent in every terminal.
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
+# Use the desktop keyring-backed SSH agent when available on Linux.
+if [[ "$(uname)" == "Linux" && -n "${XDG_RUNTIME_DIR:-}" && -S "$XDG_RUNTIME_DIR/gcr/ssh" ]]; then
+  export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -105,6 +107,3 @@ fi
 export PATH="$HOME/.npm-global/bin:$PATH"
 export EDITOR=nvim
 eval "$(direnv hook zsh)"
-
-# Pi
-export PATH="/home/philuvarov/.local/share/pi-node/node-v22.23.2-linux-x64/bin:$PATH"
