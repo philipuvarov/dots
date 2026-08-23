@@ -169,17 +169,21 @@ def generate_ssh_key():
     )
 
 
+def clone_nvim_config():
+    section("Cloning Neovim config")
+    nvim_dir = Path.home() / ".config" / "nvim"
+    if nvim_dir.exists():
+        print(f"{nvim_dir} already exists, skipping")
+        return
+
+    run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
+
+
 def setup_dotfiles():
     section("Setting up dotfiles")
     config_dir = Path.home() / ".config"
-    config_dir.mkdir(exist_ok=True)
-
-    # Clone neovim config
-    nvim_dir = config_dir / "nvim"
-    if nvim_dir.exists():
-        print(f"{nvim_dir} already exists, skipping")
-    else:
-        run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
+    if not DRY_RUN:
+        config_dir.mkdir(exist_ok=True)
 
     # Symlink desktop and terminal configs
     symlink_path(DOTS_DIR / "hypr", config_dir / "hypr")
@@ -247,9 +251,9 @@ def setup_keyd():
     run(["sudo", "mkdir", "-p", "/etc/keyd"])
     run(["sudo", "cp", str(keyd_src), "/etc/keyd/default.conf"])
 
-    # Enable and start keyd service
+    # Re-enable and restart keyd so the copied config takes effect.
     run(["sudo", "systemctl", "enable", "keyd"])
-    run(["sudo", "systemctl", "start", "keyd"])
+    run(["sudo", "systemctl", "restart", "keyd"])
 
 
 def setup_ly():
@@ -266,7 +270,8 @@ def setup_ly():
 def install_nerd_fonts():
     section("Installing Nerd Fonts")
     fonts_dir = Path.home() / ".local" / "share" / "fonts"
-    fonts_dir.mkdir(parents=True, exist_ok=True)
+    if not DRY_RUN:
+        fonts_dir.mkdir(parents=True, exist_ok=True)
 
     tmp_dir = Path("/tmp/nerd-fonts")
     if not DRY_RUN:
@@ -387,29 +392,26 @@ def print_post_install_notes():
 
 
 def main():
+    """Bootstrap a new Arch machine, then apply the managed configuration."""
     if DRY_RUN:
         print("*** DRY RUN MODE - No changes will be made ***\n")
 
-    check_yay()
-    install_pacman_packages()
-    install_aur_packages()
+    # Import here to avoid a circular import when configure.py loads this module.
+    from configure import configure
+
+    configure("arch", link_zshrc=False)
     install_uv()
     install_pi()
-    setup_git_config()
     generate_ssh_key()
-    setup_dotfiles()
-    setup_pi()
-    setup_keyd()
-    setup_ly()
+    clone_nvim_config()
     install_nerd_fonts()
-    setup_desktop_preferences()
     install_starship_prompt()
     install_omzsh_and_plugins()
     setup_zshrc()
     change_shell_to_zsh()
     print_post_install_notes()
 
-    print("\n Setup complete! Please reboot.")
+    print("\n Bootstrap complete! Please reboot.")
 
 
 if __name__ == "__main__":

@@ -6,9 +6,9 @@ This is a **personal dotfiles repository** for managing development environment 
 
 **Supported Platforms**: Fedora Linux, Arch Linux, macOS
 **Setup Commands** (from the `setup/` directory):
-- Fedora: `uv run fedora_setup.py`
-- Arch: `uv run arch_setup.py`
-- macOS: `uv run mac_setup.py`
+- New machine: `uv run bootstrap.py`
+- Existing machine: `uv run configure.py`
+- Both commands detect the platform and support `--dry-run` and `--platform`
 
 ## Repository Structure
 
@@ -34,10 +34,12 @@ dots/
 │   ├── extensions/     # Local Pi extensions, including Herdr integration
 │   └── local-packages/ # Repo-owned Pi packages and theme pack
 └── setup/              # Setup automation scripts
+    ├── bootstrap.py    # New-machine entry point with platform detection
+    ├── configure.py    # Reapply managed state on an existing machine
     ├── packages.py     # Shared package definitions across platforms
-    ├── fedora_setup.py # Fedora setup script
-    ├── arch_setup.py   # Arch Linux setup script
-    ├── mac_setup.py    # macOS setup script
+    ├── fedora_setup.py # Fedora implementation
+    ├── arch_setup.py   # Arch Linux implementation
+    ├── mac_setup.py    # macOS implementation
     ├── pyproject.toml  # Python project metadata
     └── .python-version # Python 3.14
 ```
@@ -94,6 +96,24 @@ dots/
 
 ## Setup Scripts
 
+### Entry points
+
+```bash
+cd setup/
+uv run bootstrap.py           # Prepare a new machine, then configure it
+uv run configure.py           # Reapply managed state to an existing machine
+uv run configure.py --dry-run # Preview without executing
+```
+
+`configure.py` manages packages, dotfile and Pi links, copied system configs,
+services, Git settings, and desktop preferences. `bootstrap.py` additionally
+runs one-time tool installers, generates an SSH key, clones the Neovim config,
+installs fonts, Oh My Zsh, and Starship, and changes the default shell.
+
+Platform-specific behavior remains in `fedora_setup.py`, `arch_setup.py`, and
+`mac_setup.py`. Arch requires the `yay` AUR helper. Directly running a platform
+module remains supported and performs a bootstrap.
+
 ### Shared Configuration (packages.py)
 Common definitions used by the setup scripts:
 - **COMMON_PACKAGES**: neovim, kitty, zsh, lazygit, luarocks, fzf, telegram-desktop, steam, keyd
@@ -101,43 +121,6 @@ Common definitions used by the setup scripts:
 - **HOMEBREW_FORMULAE** includes Herdr; **HOMEBREW_CASKS** includes Ghostty and Kitty
 - **NERD_FONTS**: IBMPlexMono, ZedMono
 - **GIT_CONFIG**: user.email, user.name
-
-### Fedora Setup (fedora_setup.py)
-```bash
-cd setup/
-uv run fedora_setup.py          # Full setup
-uv run fedora_setup.py --dry-run # Preview without executing
-```
-
-**Installation Steps:**
-1. RPM Fusion repositories (free media packages)
-2. COPR repositories (lazygit, keyd, Ghostty)
-3. DNF packages (from FEDORA_PACKAGES, includes Ghostty and keyd)
-4. Flatpak packages: Bitwarden, Discord
-5. uv, Pi, Herdr, git config, SSH key, dotfiles, keyd setup
-6. Nerd Fonts, GNOME keybindings, zsh, Starship, Oh-My-Zsh
-
-### Arch Setup (arch_setup.py)
-```bash
-cd setup/
-uv run arch_setup.py          # Full setup
-uv run arch_setup.py --dry-run # Preview without executing
-```
-
-**Requirements**: yay (AUR helper) must be installed first
-
-**Installation Steps:**
-1. Pacman packages (Kitty, Hyprland stack, Ly, GNOME Shell, keyd, and shared tools; no Ghostty)
-2. AUR packages: herdr-bin, tofi
-3. uv, Pi, git config, SSH key, Hyprland/Kitty/Tofi/Herdr/Pi dotfiles, wallpaper, keyd setup
-4. Install Cyberdream Ly config and enable Ly greeter
-5. Nerd Fonts, GTK dark preference, GNOME keybindings, zsh, Starship, Oh-My-Zsh
-
-### macOS Setup (mac_setup.py)
-- Installs Homebrew formulae/casks, including Herdr, Ghostty, and Kitty
-- Installs Pi with its official installer
-- Links macOS's Ghostty Application Support config plus shared Herdr/Pi/shell configs
-- Installs Nerd Fonts, Starship, Oh-My-Zsh, and plugins
 
 ### Symlink Strategy
 The script creates these symlinks:
@@ -194,13 +177,13 @@ Main branch: `main`
 - **Adding new config**: Create directory, add config file, update setup scripts' symlinks
 - **Adding new distro**: Create new setup script in setup/, import from packages.py
 - **Adding shared packages**: Edit packages.py COMMON_PACKAGES list; use distro-specific lists for platform-only packages
-- **Modifying setup**: Edit the relevant setup script, test with --dry-run first
+- **Modifying setup**: Edit `configure.py` and the relevant platform module, then test with `--dry-run`
 - **Config changes**: Edit files directly (kitty.conf, .zshrc, etc.)
 
 ### Important Notes
 - Always test setup script changes with `--dry-run` first
 - Symlinks mean config changes are immediate (no re-linking needed)
-- keyd and Ly config changes require re-running setup or manually copying to `/etc/keyd/` and `/etc/ly/`
+- keyd and Ly config changes require running `configure.py` or manually copying to `/etc/keyd/` and `/etc/ly/`
 - The repository references external dependency: kickstart.nvim for neovim config
 
 ### File Locations After Setup

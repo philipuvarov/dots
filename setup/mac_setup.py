@@ -157,18 +157,21 @@ def generate_ssh_key():
     run(["ssh-keygen", "-t", "ed25519", "-C", email, "-f", str(key_path), "-N", ""])
 
 
+def clone_nvim_config():
+    section("Cloning Neovim config")
+    nvim_dir = Path.home() / ".config" / "nvim"
+    if nvim_dir.exists():
+        print(f"{nvim_dir} already exists, skipping")
+        return
+
+    run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
+
+
 def setup_dotfiles():
     section("Setting up dotfiles")
     config_dir = Path.home() / ".config"
     if not DRY_RUN:
         config_dir.mkdir(exist_ok=True)
-
-    # Clone neovim config
-    nvim_dir = config_dir / "nvim"
-    if nvim_dir.exists():
-        print(f"{nvim_dir} already exists, skipping")
-    else:
-        run(["git", "clone", DOTFILE_REPOS["nvim"], str(nvim_dir)])
 
     # Symlink terminal configs
     symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
@@ -331,16 +334,18 @@ def print_post_install_notes():
 
 
 def main():
+    """Bootstrap a new macOS machine, then apply the managed configuration."""
     if DRY_RUN:
         print("*** DRY RUN MODE - No changes will be made ***\n")
 
-    install_homebrew_packages()
+    # Import here to avoid a circular import when configure.py loads this module.
+    from configure import configure
+
+    configure("macos", link_zshrc=False)
     install_uv()
     install_pi()
-    setup_git_config()
     generate_ssh_key()
-    setup_dotfiles()
-    setup_pi()
+    clone_nvim_config()
     install_nerd_fonts()
     install_starship_prompt()
     install_omzsh_and_plugins()
@@ -348,7 +353,7 @@ def main():
     change_shell_to_zsh()
     print_post_install_notes()
 
-    print("\n Setup complete!")
+    print("\n Bootstrap complete!")
 
 
 if __name__ == "__main__":
