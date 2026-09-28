@@ -69,7 +69,7 @@ ARCH_EXTRA_PACKAGES = [
 ]
 
 # macOS: Homebrew packages. Linux-only keyd/GNOME behavior is intentionally
-# handled by the Linux scripts; Telegram, Discord, and Bitwarden are skipped.
+# handled by the Linux scripts; Discord and Bitwarden are skipped.
 HOMEBREW_FORMULAE = [
     "btop",
     "fd",
@@ -87,9 +87,11 @@ HOMEBREW_FORMULAE = [
 ]
 
 HOMEBREW_CASKS = [
+    "firefox",
     "ghostty",
     "kitty",
     "steam",
+    "telegram",
 ]
 
 # =============================================================================

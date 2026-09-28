@@ -107,4 +107,3 @@ fi
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/share/pi-node/current/bin:$PATH"
 export EDITOR=nvim
-eval "$(direnv hook zsh)"
