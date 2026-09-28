@@ -186,6 +186,7 @@ def setup_dotfiles():
         config_dir.mkdir(exist_ok=True)
 
     # Symlink terminal configs
+    symlink_path(DOTS_DIR / "btop", config_dir / "btop")
     symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
 
     ghostty_config_dir = config_dir / "ghostty"

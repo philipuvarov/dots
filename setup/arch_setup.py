@@ -186,6 +186,7 @@ def setup_dotfiles():
         config_dir.mkdir(exist_ok=True)
 
     # Symlink desktop and terminal configs
+    symlink_path(DOTS_DIR / "btop", config_dir / "btop")
     symlink_path(DOTS_DIR / "hypr", config_dir / "hypr")
     symlink_path(DOTS_DIR / "kitty", config_dir / "kitty")
     symlink_path(DOTS_DIR / "mako", config_dir / "mako")

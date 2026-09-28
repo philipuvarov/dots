@@ -12,6 +12,7 @@ import os
 # =============================================================================
 
 COMMON_PACKAGES = [
+    "btop",
     "neovim",
     "kitty",
     "zsh",
@@ -38,13 +39,13 @@ ARCH_PACMAN_PACKAGES = [
     "hyprpaper",
     "hyprlock",
     "hypridle",
+    "hyprshot",
     "waybar",
     "mako",
     "libnotify",
     "ly",
     "gnome-shell",
     "firefox",
-    "btop",
     "nautilus",
     "network-manager-applet",
     "pipewire",
@@ -70,6 +71,7 @@ ARCH_EXTRA_PACKAGES = [
 # macOS: Homebrew packages. Linux-only keyd/GNOME behavior is intentionally
 # handled by the Linux scripts; Telegram, Discord, and Bitwarden are skipped.
 HOMEBREW_FORMULAE = [
+    "btop",
     "fd",
     "go",
     "herdr",
@@ -120,7 +122,7 @@ GIT_CONFIG = {
 # =============================================================================
 
 DOTFILE_REPOS = {
-    "nvim": os.environ.get("DOTS_NVIM_REPO", "https://github.com/nvim-lua/kickstart.nvim.git"),
+    "nvim": os.environ.get("DOTS_NVIM_REPO", "https://github.com/philipuvarov/kickstart.nvim.git"),
     "dots": os.environ.get("DOTS_REPO", ""),
 }
 
