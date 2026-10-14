@@ -103,7 +103,8 @@ if [[ "$(uname)" == "Darwin" ]]; then
   fi
 fi
 
-. "$HOME/.local/bin/env"
+[ -r "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+export PATH="$HOME/.local/bin:$HOME/.pi/agent/bin:$PATH"
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.local/share/pi-node/current/bin:$PATH"
 export EDITOR=nvim

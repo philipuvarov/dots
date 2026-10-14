@@ -141,7 +141,7 @@ def install_uv():
 
 def install_pi():
     section("Installing Pi")
-    run("curl -fsSL https://pi.dev/install.sh | sh", shell=True)
+    run(["bash", "-o", "pipefail", "-c", "curl -fsSL https://pi.dev/install.sh | sh"])
 
 
 def install_herdr():
@@ -376,7 +376,6 @@ def main():
 
     configure("fedora", link_zshrc=False)
     install_uv()
-    install_pi()
     install_herdr()
     generate_ssh_key()
     clone_nvim_config()

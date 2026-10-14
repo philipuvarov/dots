@@ -40,8 +40,9 @@ uv run configure.py
 ```
 
 Configure reapplies packages, dotfile links, Pi links, copied system configs,
-services, Git settings, and desktop preferences. It does not rerun remote tool
-installers, download fonts, generate SSH keys, or clone repositories.
+services, Git settings, and desktop preferences. It also installs Pi if `pi`
+is missing from PATH. Other remote tool installers, font downloads, SSH key
+generation, and repository cloning run only during bootstrap.
 
 ## Arch / Hyprland screenshots
 

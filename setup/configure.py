@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import platform as host_platform
+import shutil
 from pathlib import Path
 
 SUPPORTED_PLATFORMS = ("arch", "fedora", "macos")
@@ -81,6 +82,11 @@ def configure(
         setup.setup_git_config()
         setup.setup_dotfiles()
         setup.setup_pi()
+
+    if shutil.which("pi") is None:
+        setup.install_pi()
+    else:
+        print("Pi is already installed, skipping installer")
 
     if link_zshrc:
         setup.setup_zshrc()

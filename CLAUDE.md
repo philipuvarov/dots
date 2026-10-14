@@ -62,7 +62,7 @@ dots/
 
 #### Ghostty (ghostty/config.ghostty)
 - BlexMono Nerd Font Mono with the built-in Oxocarbon theme
-- Minimal macOS chrome and Kitty-compatible clipboard behavior
+- Native macOS titlebar and Kitty-compatible clipboard behavior
 - Super+arrow escape-sequence bindings for cycling Herdr tabs and workspaces
 
 ### Herdr (herdr/config.toml)
@@ -106,7 +106,8 @@ uv run configure.py --dry-run # Preview without executing
 ```
 
 `configure.py` manages packages, dotfile and Pi links, copied system configs,
-services, Git settings, and desktop preferences. `bootstrap.py` additionally
+services, Git settings, and desktop preferences, and installs Pi when missing
+from PATH. `bootstrap.py` additionally
 runs one-time tool installers, generates an SSH key, clones the Neovim config,
 installs fonts, Oh My Zsh, and Starship, and changes the default shell.
 

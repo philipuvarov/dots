@@ -36,6 +36,6 @@ keybind = super+9=goto_tab:9
 keybind = super+arrow_up=text:\x1c
 keybind = super+arrow_down=text:\x1e
 
-# Minimal macOS chrome while retaining tabs
-macos-titlebar-style = tabs
+# Standard macOS titlebar and tab bar
+macos-titlebar-style = native
 macos-window-buttons = visible

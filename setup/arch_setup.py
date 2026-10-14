@@ -132,7 +132,7 @@ def install_uv():
 
 def install_pi():
     section("Installing Pi")
-    run("curl -fsSL https://pi.dev/install.sh | sh", shell=True)
+    run(["bash", "-o", "pipefail", "-c", "curl -fsSL https://pi.dev/install.sh | sh"])
 
 
 def setup_git_config():
@@ -402,7 +402,6 @@ def main():
 
     configure("arch", link_zshrc=False)
     install_uv()
-    install_pi()
     generate_ssh_key()
     clone_nvim_config()
     install_nerd_fonts()

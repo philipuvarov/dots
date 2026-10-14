@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.87.1",
+  "lastChangelogVersion": "1.2.0",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",
   "defaultThinkingLevel": "high",
@@ -11,5 +11,10 @@
   ],
   "packages": [
     "local-packages/pi-theme-pack"
+  ],
+  "enabledModels": [
+    "openrouter/deepseek/deepseek-v4.1-flash",
+    "openrouter/xiaomi/mimo-v2.6-pro",
+    "openrouter/xiaomi/mimo-v2.6-flash"
   ]
 }
