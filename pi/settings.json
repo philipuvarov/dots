@@ -1,10 +1,11 @@
 {
-  "lastChangelogVersion": "1.2.0",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-6-astra",
-  "defaultThinkingLevel": "high",
-  "hideThinkingBlock": true,
+  "lastChangelogVersion": "1.0.0",
+  "defaultProvider": "openrouter",
+  "defaultModel": "deepseek/deepseek-v4.1-flash",
+  "defaultThinkingLevel": "max",
+  "hideThinkingBlock": false,
   "theme": "oxocarbon",
+  "sessionDir": "~/.pi/agent/sessions-global",
   "extensions": [
     "-extensions/ctrl-c-interrupt/index.ts",
     "-extensions/pi-danger-guardrail/index.ts"
@@ -13,8 +14,9 @@
     "local-packages/pi-theme-pack"
   ],
   "enabledModels": [
-    "openrouter/deepseek/deepseek-v4.1-flash",
+    "opencode-go/mimo-v2.6-flash",
+    "opencode-go/mimo-v2.6-pro",
     "openrouter/xiaomi/mimo-v2.6-pro",
-    "openrouter/xiaomi/mimo-v2.6-flash"
+    "openrouter/deepseek/deepseek-v4.1-flash"
   ]
 }

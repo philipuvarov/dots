@@ -2,6 +2,7 @@
 auth.json
 trust.json
 sessions/
+skills/
 bin/
 npm/
 node_modules/
